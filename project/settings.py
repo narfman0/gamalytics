@@ -1,5 +1,5 @@
-# Django settings for project project.
-
+from registration_defaults.settings import *
+import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -13,10 +13,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', 
         'NAME': 'db.sqlite3',
-        'USER': '',     # Not used with sqlite3.
-        'PASSWORD': '', # Not used with sqlite3.
-        'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -107,12 +107,12 @@ ROOT_URLCONF = 'project.urls'
 WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.getcwd()+'/project',
 )
 
 INSTALLED_APPS = (
+    'registration_defaults',
+    'registration',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -124,11 +124,8 @@ INSTALLED_APPS = (
     'gamalytics',
 )
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
+ACCOUNT_ACTIVATION_DAYS = 7
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
