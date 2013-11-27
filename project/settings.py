@@ -1,4 +1,3 @@
-from registration_defaults.settings import *
 import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -111,8 +110,6 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'registration_defaults',
-    'registration',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -123,8 +120,6 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'gamalytics',
 )
-
-ACCOUNT_ACTIVATION_DAYS = 7
 
 LOGGING = {
     'version': 1,
