@@ -107,6 +107,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.getcwd()+'/project',
+    os.getcwd()+'/gamalytics/templates',
 )
 
 INSTALLED_APPS = (

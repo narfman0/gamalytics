@@ -1,0 +1,8 @@
+{% if game %}
+    <h1>{{ game.gamename }}</h1>
+    <a href="{{ game.metacritic }}">Metacritic</a></br>
+    <a href="{{ game.gametrailers }}">Gametrailers</a></br>
+    {{ game.description }}
+{% else %}
+    <p>No game available.</p>
+{% endif %}
