@@ -1,0 +1,12 @@
+{% include 'index.html' %}
+{% for game in games %}
+<li><a href="/gamalytics/g/{{game.gamename}}">{{ game.gamename }}</a></li>
+{% endfor %}
+{% for tag,game in tagged.items %}
+  <ul>
+  {{tag}}
+  {% for gamename,value in game %}
+    <li><a href="/gamalytics/g/{{gamename}}">{{ gamename }} - {{ value }}%</a></li>
+  {% endfor %}
+  </ul>
+{% endfor %}
