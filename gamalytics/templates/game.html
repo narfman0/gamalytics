@@ -3,6 +3,11 @@
     <a href="{{ game.metacritic }}">Metacritic</a></br>
     <a href="{{ game.gametrailers }}">Gametrailers</a></br>
     {{ game.description }}
+    <ul>
+    {% for tag,value in ratings %}
+    <li><a href="/gamalytics/t/{{tag}}">{{ tag }}: {{ value }}</a></li>
+    {% endfor %}
+    </ul>
 {% else %}
     <p>No game available.</p>
 {% endif %}
