@@ -14,13 +14,13 @@ def getGameTagRating(gamename,tag):
 #Get all games with tag
 def getGamesWithTag(tag):
   gamenames=set()
-  for rating in Rating.objects.filter(tag=tag):
+  for rating in Rating.objects.filter(tag__iexact=tag):
     gamenames.update((rating.gamename,))
   return gamenames
 
 def getGameAveragedTags(gamename):
   ratingMap={}
-  for rating in Rating.objects.filter(gamename=gamename):
+  for rating in Rating.objects.filter(gamename__iexact=gamename):
     s=ratingMap.get(rating.tag,[])
     s.append(rating.value)
     ratingMap[rating.tag]=s
@@ -46,10 +46,10 @@ def search(request):
   #Search games AND tags
   games=set()
   for term in searchTerms:
-    games.update(Game.objects.filter(gamename=term))
+    games.update(Game.objects.filter(gamename__iexact=term))
   tags=set()
   for term in searchTerms:
-    tags.update(Rating.objects.filter(tag=term))
+    tags.update(Rating.objects.filter(tag__iexact=term))
   tagged={}
   for tag in tags:
     tagged[tag.tag]=getGamesSortedTag(tag.tag)
