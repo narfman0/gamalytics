@@ -53,12 +53,11 @@ def search(request):
   tagged={}
   for tag in tags:
     tagged[tag.tag]=getGamesSortedTag(tag.tag)
-  print('Search tagged: ' + str(tagged))
   context={'games':games, 'tagged':tagged}
   return render(request,'search.html',context)
 
-def detail(request, gamename):
-  game=Game.objects.filter(gamename=gamename)[0]
+def game(request, gamename):
+  game=Game.objects.get(gamename__iexact=gamename)
   ratings=getGameAveragedTags(game.gamename)
   context={'game' : game, 'ratings' : ratings}
   return render(request,'game.html',context)
