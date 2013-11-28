@@ -42,11 +42,13 @@ def index(request):
   return render(request,'index.html',context)
 
 def search(request):
-  searchTerms=request.GET['q'].split()
+  searchString=request.GET['q']
+  searchTerms=searchString.split()
   #Search games AND tags
   games=set()
   for term in searchTerms:
     games.update(Game.objects.filter(gamename__iexact=term))
+  games.update(Game.objects.filter(gamename__contains=searchString))
   tags=set()
   for term in searchTerms:
     tags.update(Rating.objects.filter(tag__iexact=term))
