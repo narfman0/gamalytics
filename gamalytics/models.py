@@ -19,3 +19,4 @@ class Game(models.Model):
     metacritic = models.URLField()
     gametrailers = models.URLField()
     description = models.TextField()
+    released = models.DateTimeField(default=datetime.now)
