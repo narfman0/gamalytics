@@ -1,1 +1,17 @@
 {% include 'header.html' %}
+<div>
+Genre
+  <ul>
+    {% for genre in genres %}
+    <li><a href="/gamalytics/s/?q={{genre}}">{{genre}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+<div>
+  Games
+  <ul>
+    {% for game in games %}
+    <li><a href="/gamalytics/g/{{game.gamename}}">{{game.gamename}}</a></li>
+    {% endfor %}
+  </ul>
+</div>

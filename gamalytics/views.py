@@ -38,7 +38,9 @@ def getGamesSortedTag(tag):
 
 def index(request):
   games=Game.objects.all()
-  context={'games':games}
+  context={'games':games, 'genres':{'Action','Adventure','Fighting',
+    '1PS','3PS','Flight','Party','Platformer','Puzzle','Racing','RTS','RPG',
+    'Simulation','Sports','Strategy'}}
   return render(request,'index.html',context)
 
 def search(request):
@@ -55,7 +57,7 @@ def search(request):
   tagged={}
   for tag in tags:
     tagged[tag.tag]=getGamesSortedTag(tag.tag)
-  context={'games':games, 'tagged':tagged}
+  context={'games':games, 'tagged':tagged, 'searchString':searchString}
   return render(request,'search.html',context)
 
 def game(request, gamename):
