@@ -4,6 +4,9 @@
 <a href="{{ game.gametrailers }}">Gametrailers</a></br>
 {{ game.description }}
 <ul>
+{% if game.published and game.published != '' %}
+<li>Release Date: {{ game.published }}</li>
+{% endif %}
 {% for tag,value in ratings %}
 <li><a href="/gamalytics/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
 {% endfor %}
