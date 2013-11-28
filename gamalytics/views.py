@@ -42,7 +42,7 @@ def index(request):
   return render(request,'index.html',context)
 
 def search(request):
-  searchTerms=request.GET['q'].split(',')
+  searchTerms=request.GET['q'].split()
   #Search games AND tags
   games=set()
   for term in searchTerms:
