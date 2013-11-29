@@ -1,5 +1,5 @@
 {% include 'header.html' %}
-<div>
+<div class="container-left">
 Genre
   <ul>
     {% for genre in genres %}
@@ -7,11 +7,19 @@ Genre
     {% endfor %}
   </ul>
 </div>
-<div>
+<div class="container-left">
   Most Recent Games:
   <ul>
     {% for game in games %}
     <li><a href="/gamalytics/g/{{game.gamename}}">{{game.gamename}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+<div class="container-left">
+  Platforms:
+  <ul>
+    {% for platform in platforms %}
+    <li><a href="/gamalytics/s/{{platform}}">{{platform}}</a></li>
     {% endfor %}
   </ul>
 </div>

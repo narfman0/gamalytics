@@ -2,6 +2,9 @@ from django.shortcuts import render
 from gamalytics.models import Game,Rating
 from difflib import SequenceMatcher
 
+GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
+PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS','Wii','DS',)
+
 #Calculate a game's tag value
 def getGameTagRating(game,tag):
   r = Rating.objects.filter(game__gamename=game.gamename, tag=tag)
@@ -38,10 +41,8 @@ def getGamesSortedTag(tag):
   return sorted(gameMap.items(), key=lambda x: x[1], reverse=True)
 
 def index(request):
-  games=list(Game.objects.all().order_by('released'))[-5:]
-  context={'games':games, 'genres':{'Action','Adventure','Fighting',
-    '1PS','3PS','Flight','Party','Platformer','Puzzle','Racing','RTS','RPG',
-    'Simulation','Sports','Strategy'}}
+  games=list(Game.objects.all().order_by('released'))[-10:]
+  context={'games':games, 'genres':GENRES, 'platforms':PLATFORMS}
   return render(request,'index.html',context)
 
 def search(request):
