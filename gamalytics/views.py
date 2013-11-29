@@ -2,8 +2,8 @@ from django.shortcuts import render
 from gamalytics.models import Game,Rating
 
 #Calculate a game's tag value
-def getGameTagRating(gamename,tag):
-  r = Rating.objects.filter(gamename=gamename,tag=tag)
+def getGameTagRating(game,tag):
+  r = Rating.objects.filter(game__gamename=game.gamename, tag=tag)
   ratings=[]
   for rating in r:
     ratings.append(rating.value)
@@ -13,14 +13,14 @@ def getGameTagRating(gamename,tag):
 
 #Get all games with tag
 def getGamesWithTag(tag):
-  gamenames=set()
+  games=set()
   for rating in Rating.objects.filter(tag__iexact=tag):
-    gamenames.update((rating.gamename,))
-  return gamenames
+    games.update((rating.game,))
+  return games
 
 def getGameAveragedTags(gamename):
   ratingMap={}
-  for rating in Rating.objects.filter(gamename__iexact=gamename):
+  for rating in Rating.objects.filter(game__gamename__iexact=gamename):
     s=ratingMap.get(rating.tag,[])
     s.append(rating.value)
     ratingMap[rating.tag]=s
@@ -32,8 +32,8 @@ def getGameAveragedTags(gamename):
 #Find all games with tag and sort by how applicable they are
 def getGamesSortedTag(tag):
   gameMap={}
-  for gamename in getGamesWithTag(tag):
-    gameMap[gamename]=getGameTagRating(gamename,tag)
+  for game in getGamesWithTag(tag):
+    gameMap[game.gamename]=getGameTagRating(game,tag)
   return sorted(gameMap.items(), key=lambda x: x[1], reverse=True)
 
 def index(request):
