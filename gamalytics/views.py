@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from gamalytics.models import Game,Rating
+from difflib import SequenceMatcher
 
 #Calculate a game's tag value
 def getGameTagRating(game,tag):
@@ -51,13 +52,17 @@ def search(request):
   for term in searchTerms:
     games.update(Game.objects.filter(gamename__iexact=term))
   games.update(Game.objects.filter(gamename__contains=searchString))
+  gamesScoreMap={}
+  for game in games:
+    gamesScoreMap[game]=int(SequenceMatcher(None,searchString,game.gamename).ratio()*100)
+  gamesScoreSorted=sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
   tags=set()
   for term in searchTerms:
     tags.update(Rating.objects.filter(tag__iexact=term))
   tagged={}
   for tag in tags:
     tagged[tag.tag]=getGamesSortedTag(tag.tag)
-  context={'games':games, 'tagged':tagged, 'searchString':searchString}
+  context={'games':gamesScoreSorted, 'tagged':tagged, 'searchString':searchString}
   return render(request,'search.html',context)
 
 def game(request, gamename):
