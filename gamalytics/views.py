@@ -37,7 +37,7 @@ def getGamesSortedTag(tag):
   return sorted(gameMap.items(), key=lambda x: x[1], reverse=True)
 
 def index(request):
-  games=Game.objects.all()
+  games=list(Game.objects.all().order_by('released'))[-5:]
   context={'games':games, 'genres':{'Action','Adventure','Fighting',
     '1PS','3PS','Flight','Party','Platformer','Puzzle','Racing','RTS','RPG',
     'Simulation','Sports','Strategy'}}
@@ -63,5 +63,10 @@ def search(request):
 def game(request, gamename):
   game=Game.objects.get(gamename__iexact=gamename)
   ratings=getGameAveragedTags(game.gamename)
-  context={'game' : game, 'ratings' : ratings}
+  released=''
+  try:
+    released=game.released.strftime('%b. %d, %Y')
+  except:
+    pass
+  context={'game':game, 'ratings':ratings, 'released':released}
   return render(request,'game.html',context)

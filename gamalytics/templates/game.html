@@ -3,10 +3,11 @@
 <a href="{{ game.metacritic }}">Metacritic</a></br>
 <a href="{{ game.gametrailers }}">Gametrailers</a></br>
 {{ game.description }}
-<ul>
-{% if game.published and game.published != '' %}
-<li>Release Date: {{ game.published }}</li>
+<br/><br/>
+{% if released != '' %}
+Release Date: {{ released }}
 {% endif %}
+<ul>
 {% for tag,value in ratings %}
 <li><a href="/gamalytics/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
 {% endfor %}
