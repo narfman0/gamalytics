@@ -5,11 +5,10 @@ from difflib import SequenceMatcher
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS','Wii','DS',)
 
-#Calculate a game's tag value
+#Calculate the value for a particular game's tag
 def getGameTagRating(game,tag):
-  r = Rating.objects.filter(game__gamename=game.gamename, tag=tag)
   ratings=[]
-  for rating in r:
+  for rating in Rating.objects.filter(game__gamename=game.gamename, tag=tag):
     ratings.append(rating.value)
   if len(ratings) == 0:
     return 0.0
@@ -45,25 +44,49 @@ def index(request):
   context={'games':games, 'genres':GENRES, 'platforms':PLATFORMS}
   return render(request,'index.html',context)
 
-def search(request):
-  searchString=request.GET['q']
-  searchTerms=searchString.split()
-  #Search games AND tags
+def searchGames(query):
   games=set()
-  for term in searchTerms:
+  for term in query:
     games.update(Game.objects.filter(gamename__iexact=term))
-  games.update(Game.objects.filter(gamename__contains=searchString))
+  games.update(Game.objects.filter(gamename__contains=query))
   gamesScoreMap={}
   for game in games:
     gamesScoreMap[game]=int(SequenceMatcher(None,searchString,game.gamename).ratio()*100)
-  gamesScoreSorted=sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
-  tags=set()
-  for term in searchTerms:
-    tags.update(Rating.objects.filter(tag__iexact=term))
-  tagged={}
-  for tag in tags:
-    tagged[tag.tag]=getGamesSortedTag(tag.tag)
-  context={'games':gamesScoreSorted, 'tagged':tagged, 'searchString':searchString}
+  return sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
+
+def searchTags(query):
+  tags={}
+  tags.setdefault(0)
+  maxValue=.00000001
+  for term in query:
+    for match in Rating.objects.filter(tag__iexact=term):
+      if match.game.gamename in tags:
+        tags[match.game.gamename]=tags[match.game.gamename]+match.value
+      else:
+        tags[match.game.gamename]=match.value
+      maxValue=max(maxValue,tags[match.game.gamename])
+  del tags[0]
+  for key in tags.keys():
+    tags[key]=int(tags[key]/maxValue*100)
+  #tags=set()
+  #for term in query:
+  #  tags.update(Rating.objects.filter(tag__iexact=term))
+  #tagged={}
+  #for tag in tags:
+  #  tagged[tag.tag]=getGamesSortedTag(tag.tag)
+  #return tagged
+  return sorted(tags.items(), key=lambda x: x[1], reverse=True)
+
+#Search games and tags
+def search(request):
+  searchString=request.GET['q']
+  if ' ' in searchString:
+    searchTerms=searchString.split()
+  else:
+    searchTerms=(searchString,)
+  games=searchGames(searchTerms)
+  tagged=searchTags(searchTerms)
+  context={'games':games, 'tagged':tagged, 'searchString':searchString}
   return render(request,'search.html',context)
 
 def game(request, gamename):

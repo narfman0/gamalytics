@@ -2,11 +2,8 @@
 {% for game,score in games %}
 <li><a href="/gamalytics/g/{{game.gamename}}">{{ game.gamename }} - {{ score }}%</a></li>
 {% endfor %}
-{% for tag,game in tagged.items %}
-  <ul>
-  {{tag}}
-  {% for gamename,value in game %}
-    <li><a href="/gamalytics/g/{{gamename}}">{{ gamename }} - {{ value }}%</a></li>
-  {% endfor %}
-  </ul>
+<ul>
+{% for gamename,value in tagged %}
+  <li><a href="/gamalytics/g/{{gamename}}">{{ gamename }} - {{ value }}%</a></li>
 {% endfor %}
+</ul>
