@@ -49,9 +49,10 @@ def searchGames(query):
   for term in query:
     games.update(Game.objects.filter(gamename__iexact=term))
   games.update(Game.objects.filter(gamename__contains=query))
+  print(str(games))
   gamesScoreMap={}
   for game in games:
-    gamesScoreMap[game]=int(SequenceMatcher(None,searchString,game.gamename).ratio()*100)
+    gamesScoreMap[game]=int(SequenceMatcher(None,query,game.gamename).ratio()*100)
   return sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
 
 def searchTags(query):
