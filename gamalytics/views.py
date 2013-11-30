@@ -47,20 +47,22 @@ def index(request):
 def searchGames(query):
   games=set()
   for term in query:
-    games.update(Game.objects.filter(gamename__iexact=term))
-  games.update(Game.objects.filter(gamename__contains=query))
-  print(str(games))
+    games.update(Game.objects.filter(gamename__icontains=term))
   gamesScoreMap={}
   for game in games:
-    gamesScoreMap[game]=int(SequenceMatcher(None,query,game.gamename).ratio()*100)
+    gamesScoreMap[game]=int(SequenceMatcher(None,' '.join(query),game.gamename).ratio()*100)
   return sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
 
 def searchTags(query):
   tags={}
+  matchedTags=[]
   tags.setdefault(0)
   maxValue=.00000001
   for term in query:
-    for match in Rating.objects.filter(tag__iexact=term):
+    results=Rating.objects.filter(tag__iexact=term)
+    if len(results) > 0:
+      matchedTags.append(term)
+    for match in results:
       if match.game.gamename in tags:
         tags[match.game.gamename]=tags[match.game.gamename]+match.value
       else:
@@ -76,7 +78,8 @@ def searchTags(query):
   #for tag in tags:
   #  tagged[tag.tag]=getGamesSortedTag(tag.tag)
   #return tagged
-  return sorted(tags.items(), key=lambda x: x[1], reverse=True)
+  sortedTags=sorted(tags.items(), key=lambda x: x[1], reverse=True)
+  return (sortedTags,matchedTags,)
 
 #Search games and tags
 def search(request):
@@ -84,9 +87,11 @@ def search(request):
   if ' ' in searchString:
     searchTerms=searchString.split()
   else:
-    searchTerms=(searchString,)
+    searchTerms=[searchString]
+  tagged,matchedTags=searchTags(searchTerms)
+  for matchedTag in matchedTags:
+    searchTerms.remove(matchedTag)
   games=searchGames(searchTerms)
-  tagged=searchTags(searchTerms)
   context={'games':games, 'tagged':tagged, 'searchString':searchString}
   return render(request,'search.html',context)
 
