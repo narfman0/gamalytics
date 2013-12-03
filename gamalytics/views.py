@@ -32,6 +32,24 @@ def getGameAveragedTags(gamename):
     ratings[k]=sum(v)/len(v)
   return sorted(ratings.items(), key=lambda x: x[1], reverse=True)
 
+#Return a list of similar games along with how similar they are
+#Make game average cache. Keep list of tag averages for all games
+#and remove game from cache map when a tag is updated (possible add to 
+#update queue)
+def getSimilar(ratings):
+  games={}
+  i=0
+  for tag,value in ratings:
+    gamesTag=getGamesWithTag(tag)
+    if i == 0:
+      for game in gamesTag:
+        games[game] = getGameAveragedTags(game.gamename)
+    for game in games.keys():
+      if not game in gamesTag:
+        games.pop(game,None)
+    i+=1
+  return games
+
 #Find all games with tag and sort by how applicable they are
 def getGamesSortedTag(tag):
   gameMap={}
@@ -103,5 +121,5 @@ def game(request, gamename):
     released=game.released.strftime('%b. %d, %Y')
   except:
     pass
-  context={'game':game, 'ratings':ratings, 'released':released}
+  context={'game':game, 'ratings':ratings, 'released':released, 'similar':getSimilar(ratings)}
   return render(request,'game.html',context)
