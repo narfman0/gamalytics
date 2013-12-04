@@ -99,7 +99,7 @@ def search(request):
 
 def game(request, gamename):
   game=Game.objects.get(gamename__iexact=gamename)
-  ratings=ratingCache.getGameTagsAveraged(game.gamename)
+  ratings=ratingCache.getGameTagsAveraged(gamename)
   released=''
   try:
     released=game.released.strftime('%b. %d, %Y')
