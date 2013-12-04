@@ -6,13 +6,15 @@ from gamalytics.models import Game,Rating
 class RatingCache:
   allRatings={}
 
-  def __init__(self):
-    count=Game.objects.all().count()
-    current=1
-    for game in Game.objects.all():
-      self.updateGameAveragedTags(game.gamename)
-      print('Finished cache of game ' + str(current) + '/' + str(count) + ': ' + game.gamename)
-      current += 1
+  #prepopulate - if true, calculate all games at startup
+  def __init__(self, prepopulate):
+    if prepopulate:
+      count=Game.objects.all().count()
+      current=1.0
+      for game in Game.objects.all():
+        self.updateGameAveragedTags(game.gamename)
+        print('Cache '+str(100*current/count) + '% done, finished '+game.gamename)
+        current += 1
 
   def updateGameAveragedTags(self, gamename):
     ratingMap={}

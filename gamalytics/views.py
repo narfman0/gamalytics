@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from gamalytics.models import Game,Rating
 from difflib import SequenceMatcher
-from ratingCache import RatingCache
+from gamalytics.ratingCache import RatingCache
 
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
-ratingCache=RatingCache()
+ratingCache=RatingCache(False)
 
 #Calculate the value for a particular game's tag
 def getGameTagRating(game,tag):
