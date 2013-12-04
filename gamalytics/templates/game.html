@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
 {% include 'header.html' %}
 <h1>{{ game.gamename }}</h1>
 <a href="{{ game.metacritic }}">Metacritic</a></br>
@@ -25,3 +29,5 @@ Similar Games:<br/>
 {% endfor %}
 {% endfor %}
 </ul>
+</body>
+</html>
