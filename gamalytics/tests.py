@@ -1,16 +1,29 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
+from gamalytics.models import Game,Rating
+from ratingCache import RatingCache
+from django.utils import timezone
 
+class RatingCacheTest(TestCase):
+  def setUp(self):
+    Game.objects.create(gamename='testgame',
+        metacritic='http://metacritic.com',
+        gametrailers='http://gametrailers.com',
+        description='description',released=timezone.now())
+    Rating.objects.create(username='username',game_id='1',
+        tag='pc',value=100,time=timezone.now())
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+  def test_rating_cache_initial(self):
+    cache=RatingCache()
+    tags=cache.getGameTagsAveraged('testgame')
+    for tag,value in tags:
+      self.assertEqual(tag,'pc')
+      self.assertEqual(value,100)
+
+  def test_rating_cache_add_rating(self):
+    Rating.objects.create(username='username2',game_id='1',
+        tag='pc',value=0,time=timezone.now())
+    cache=RatingCache()
+    tags=cache.getGameTagsAveraged('testgame')
+    for tag,value in tags:
+      self.assertEqual(tag,'pc')
+      self.assertEqual(value,50)

@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from gamalytics.models import Game,Rating
 from difflib import SequenceMatcher
+from ratingCache import RatingCache
 
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
+ratingCache=RatingCache()
 
 #Calculate the value for a particular game's tag
 def getGameTagRating(game,tag):
@@ -21,20 +23,8 @@ def getGamesWithTag(tag):
     games.update((rating.game,))
   return games
 
-def getGameAveragedTags(gamename):
-  ratingMap={}
-  for rating in Rating.objects.filter(game__gamename__iexact=gamename):
-    s=ratingMap.get(rating.tag,[])
-    s.append(rating.value)
-    ratingMap[rating.tag]=s
-  ratings={}
-  for k,v in ratingMap.items():
-    ratings[k]=sum(v)/len(v)
-  return sorted(ratings.items(), key=lambda x: x[1], reverse=True)
-
 #Return a list of similar games along with how similar they are
-#Make game average cache. Keep list of tag averages for all games
-#and remove game from cache map when a tag is updated (possible add to 
+#Remove game from cache map when a tag is updated (possible add to 
 #update queue)
 def getSimilar(ratings):
   games={}
@@ -43,7 +33,7 @@ def getSimilar(ratings):
     gamesTag=getGamesWithTag(tag)
     if i == 0:
       for game in gamesTag:
-        games[game] = getGameAveragedTags(game.gamename)
+        games[game] = ratingCache.getGameTagsAveraged(game.gamename)
     for game in list(games.keys()):
       if not game in gamesTag:
         games.pop(game,None)
@@ -109,7 +99,7 @@ def search(request):
 
 def game(request, gamename):
   game=Game.objects.get(gamename__iexact=gamename)
-  ratings=getGameAveragedTags(game.gamename)
+  ratings=ratingCache.getGameTagsAveraged(game.gamename)
   released=''
   try:
     released=game.released.strftime('%b. %d, %Y')
