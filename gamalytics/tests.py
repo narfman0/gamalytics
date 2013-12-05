@@ -13,7 +13,7 @@ class RatingCacheTest(TestCase):
         tag='pc',value=100,time=timezone.now())
 
   def test_rating_cache_initial(self):
-    cache=RatingCache()
+    cache=RatingCache(True)
     tags=cache.getGameTagsAveraged('testgame')
     for tag,value in tags:
       self.assertEqual(tag,'pc')

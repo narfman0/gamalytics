@@ -14,7 +14,7 @@ class RatingCache:
       count=Game.objects.all().count()
       current=1.0
       for game in Game.objects.all():
-        cache.set(self.getKey(gamename), self.calculateGameAveragedTags(game.gamename), CACHE_DURATION)
+        cache.set(self.getKey(game.gamename), self.calculateGameAveragedTags(game.gamename), CACHE_DURATION)
         print('Cache '+str(100*current/count) + '% done, finished '+game.gamename)
         current += 1
 
