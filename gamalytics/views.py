@@ -2,26 +2,24 @@ from django.shortcuts import render
 from gamalytics.models import Game,Rating
 from difflib import SequenceMatcher
 from gamalytics.ratingCache import RatingCache
+from django.core.cache import cache
 
+CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
 
-#Calculate the value for a particular game's tag
-def getGameTagRating(game,tag):
-  ratings=[]
-  for rating in Rating.objects.filter(game__gamename=game.gamename, tag=tag):
-    ratings.append(rating.value)
-  if len(ratings) == 0:
-    return 0.0
-  return sum(ratings)/len(ratings)
-
 #Get all games with tag
 def getGamesWithTag(tag):
-  games=set()
-  for rating in Rating.objects.filter(tag__iexact=tag):
-    games.update((rating.game,))
-  return games
+  key=ratingCache.getKey(tag)
+  result=cache.get(key)
+  if result is None:
+    games=[]
+    for rating in Rating.objects.filter(tag__iexact=tag):
+      games.append(rating.game)
+    result=set(games)
+    cache.set(key, result, CACHE_DURATION)
+  return result
 
 #Return a list of similar games along with how similar they are
 #Remove game from cache map when a tag is updated (possible add to 
@@ -39,13 +37,6 @@ def getSimilar(ratings):
         games.pop(game,None)
     i+=1
   return games
-
-#Find all games with tag and sort by how applicable they are
-def getGamesSortedTag(tag):
-  gameMap={}
-  for game in getGamesWithTag(tag):
-    gameMap[game.gamename]=getGameTagRating(game,tag)
-  return sorted(gameMap.items(), key=lambda x: x[1], reverse=True)
 
 def index(request):
   games=list(Game.objects.all().order_by('released'))[-10:]

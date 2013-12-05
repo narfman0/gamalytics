@@ -22,7 +22,7 @@ class RatingCacheTest(TestCase):
   def test_rating_cache_add_rating(self):
     Rating.objects.create(username='username2',game_id='1',
         tag='pc',value=0,time=timezone.now())
-    cache=RatingCache()
+    cache=RatingCache(True)
     tags=cache.getGameTagsAveraged('testgame')
     for tag,value in tags:
       self.assertEqual(tag,'pc')
