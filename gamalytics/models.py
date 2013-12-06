@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 class Game(models.Model):
-    gamename = models.CharField(db_index=True, max_length=100)
+    name = models.CharField(db_index=True, max_length=100)
     metacritic = models.URLField()
     gametrailers = models.URLField()
     description = models.TextField()
