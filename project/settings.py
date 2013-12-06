@@ -1,6 +1,7 @@
 import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 ADMINS = (
      ('Jon Robison', 'narfman0@yahoo.com'),
@@ -11,7 +12,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', 
-        'NAME': 'db.sqlite3',
+        'NAME': os.path.join(PROJECT_PATH,'../db.sqlite3'),
         'USER': '',
         'PASSWORD': '',
         'HOST': '',

@@ -7,15 +7,15 @@
 Games:
 <ul>
 {% for game,score in games %}
-<li><a href="/gamalytics/g/{{game.gamename}}">{{ game.gamename }} - {{ score }}%</a></li>
+<li><a href="/gamalytics/g/{{game.name}}">{{ game.name }} - {{ score }}%</a></li>
 {% endfor %}
 </ul>
 {% endif %}
 {% if tagged %}
 Tags:
 <ul>
-{% for gamename,value in tagged %}
-  <li><a href="/gamalytics/g/{{gamename}}">{{ gamename }} - {{ value }}%</a></li>
+{% for name,value in tagged %}
+  <li><a href="/gamalytics/g/{{name}}">{{ name }} - {{ value }}%</a></li>
 {% endfor %}
 </ul>
 {% endif %}

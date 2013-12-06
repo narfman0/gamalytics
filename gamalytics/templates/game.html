@@ -3,7 +3,7 @@
 {% include 'head.html' %}
 <body>
 {% include 'header.html' %}
-<h1>{{ game.gamename }}</h1>
+<h1>{{ game.name }}</h1>
 <a href="{{ game.metacritic }}">Metacritic</a></br>
 <a href="{{ game.gametrailers }}">Gametrailers</a></br>
 {{ game.description }}
@@ -23,7 +23,7 @@ Tags:<br/>
 Similar Games:<br/>
 <ul>
 {% for similarGame,similarRatings in similar.items %}
-<li><a href="/gamalytics/g/{{ similarGame.gamename }}">{{ similarGame.gamename }}</a>:
+<li><a href="/gamalytics/g/{{ similarGame.name }}">{{ similarGame.name }}</a>:
 {% for tag,value in similarRatings %}
  {{ tag }}: {{ value }}</li>
 {% endfor %}

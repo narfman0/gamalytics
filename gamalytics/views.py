@@ -31,7 +31,7 @@ def getSimilar(ratings):
     gamesTag=getGamesWithTag(tag)
     if i == 0:
       for game in gamesTag:
-        games[game] = ratingCache.getGameTagsAveraged(game.gamename)
+        games[game] = ratingCache.getGameTagsAveraged(game.name)
     for game in list(games.keys()):
       if not game in gamesTag:
         games.pop(game,None)
@@ -46,10 +46,10 @@ def index(request):
 def searchGames(query):
   games=set()
   for term in query:
-    games.update(Game.objects.filter(gamename__icontains=term))
+    games.update(Game.objects.filter(name__icontains=term))
   gamesScoreMap={}
   for game in games:
-    gamesScoreMap[game]=int(SequenceMatcher(None,' '.join(query),game.gamename).ratio()*100)
+    gamesScoreMap[game]=int(SequenceMatcher(None,' '.join(query),game.name).ratio()*100)
   return sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
 
 def searchTags(query):
@@ -62,11 +62,11 @@ def searchTags(query):
     if results.count() > 0:
       matchedTags.append(term)
     for match in results:
-      if match.game.gamename in tags:
-        tags[match.game.gamename]=tags[match.game.gamename]+match.value
+      if match.game.name in tags:
+        tags[match.game.name]=tags[match.game.name]+match.value
       else:
-        tags[match.game.gamename]=match.value
-      maxValue=max(maxValue,tags[match.game.gamename])
+        tags[match.game.name]=match.value
+      maxValue=max(maxValue,tags[match.game.name])
   del tags[0]
   for key in tags.keys():
     tags[key]=int(tags[key]/maxValue*100)
@@ -88,14 +88,14 @@ def search(request):
       'title':'Gamalytics Search - ' + searchString}
   return render(request,'search.html',context)
 
-def game(request, gamename):
-  game=Game.objects.get(gamename__iexact=gamename)
-  ratings=ratingCache.getGameTagsAveraged(gamename)
+def game(request, name):
+  game=Game.objects.get(name__iexact=name)
+  ratings=ratingCache.getGameTagsAveraged(name)
   released=''
   try:
     released=game.released.strftime('%b. %d, %Y')
   except:
     pass
   context={'game':game, 'ratings':ratings, 'released':released,
-      'similar':getSimilar(ratings), 'title':'Gamalytics - ' + gamename}
+      'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name}
   return render(request,'game.html',context)

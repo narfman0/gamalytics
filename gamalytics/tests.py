@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class RatingCacheTest(TestCase):
   def setUp(self):
-    Game.objects.create(gamename='testgame',
+    Game.objects.create(name='testgame',
         metacritic='http://metacritic.com',
         gametrailers='http://gametrailers.com',
         description='description',released=timezone.now())
