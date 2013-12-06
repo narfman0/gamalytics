@@ -7,11 +7,11 @@ class Game(models.Model):
     metacritic = models.URLField()
     gametrailers = models.URLField()
     description = models.TextField()
-    released = models.DateTimeField(default=datetime.now)
+    released = models.DateTimeField(db_index=True, default=datetime.now)
 
 class Rating(models.Model):
-    username = models.CharField(max_length=100)
+    username = models.CharField(db_index=True, max_length=100)
     game = models.ForeignKey(Game)
-    tag = models.CharField(max_length=100)
-    value = models.FloatField(validators = [MinValueValidator(0), MaxValueValidator(100)],default=50)
+    tag = models.CharField(db_index=True, max_length=100)
+    value = models.FloatField(db_index=True, validators = [MinValueValidator(0), MaxValueValidator(100)],default=50)
     time = models.DateTimeField(default=datetime.now)
