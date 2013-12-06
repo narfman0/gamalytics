@@ -7,7 +7,7 @@
 Genre
   <ul>
     {% for genre in genres %}
-    <li><a href="/gamalytics/s/?q={{genre}}">{{genre}}</a></li>
+    <li><a href="/s/?q={{genre}}">{{genre}}</a></li>
     {% endfor %}
   </ul>
 </div>
@@ -15,7 +15,7 @@ Genre
   Most Recent Games:
   <ul>
     {% for game in games %}
-    <li><a href="/gamalytics/g/{{game.name}}">{{game.name}}</a></li>
+    <li><a href="/g/{{game.name}}">{{game.name}}</a></li>
     {% endfor %}
   </ul>
 </div>
@@ -23,7 +23,7 @@ Genre
   Platforms:
   <ul>
     {% for platform in platforms %}
-    <li><a href="/gamalytics/s/?q={{platform}}">{{platform}}</a></li>
+    <li><a href="/s/?q={{platform}}">{{platform}}</a></li>
     {% endfor %}
   </ul>
 </div>

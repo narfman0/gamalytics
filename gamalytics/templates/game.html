@@ -16,14 +16,14 @@ Release Date: {{ released }}<br/><br/>
 Tags:<br/>
 <ul>
 {% for tag,value in ratings %}
-<li><a href="/gamalytics/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
+<li><a href="/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
 {% endfor %}
 </ul>
 
 Similar Games:<br/>
 <ul>
 {% for similarGame,similarRatings in similar.items %}
-<li><a href="/gamalytics/g/{{ similarGame.name }}">{{ similarGame.name }}</a>:
+<li><a href="/g/{{ similarGame.name }}">{{ similarGame.name }}</a>:
 {% for tag,value in similarRatings %}
  {{ tag }}: {{ value }}</li>
 {% endfor %}

@@ -105,15 +105,15 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = 'gamalytics.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'project.wsgi.application'
+WSGI_APPLICATION = 'gamalytics.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.getcwd()+'/project',
-    os.getcwd()+'/gamalytics/templates',
+    os.getcwd()+'/gamalytics/gamalytics/templates',
 )
+print(str(TEMPLATE_DIRS))
 
 CACHES = {
     'default': {
@@ -131,7 +131,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'gamalytics',
     'debug_toolbar',
 )
 
