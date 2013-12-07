@@ -19,24 +19,18 @@ def getGamesWithTag(tag):
     for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'):
       games.append(rating.game)
     result=set(games)
-    cache.set(key, result, CACHE_DURATION)
+    cache.set(key, result, 0)
   return result
 
 #Return a list of similar games along with how similar they are
-#Remove game from cache map when a tag is updated (possible add to 
-#update queue)
 def getSimilar(ratings):
-  games={}
-  i=0
+  matchedGames=set(Game.objects.all())
   for tag,value in ratings:
-    gamesTag=getGamesWithTag(tag)
-    if i == 0:
-      for game in gamesTag:
-        games[game] = ratingCache.getGameTagsAveraged(game.name)
-    for game in list(games.keys()):
-      if not game in gamesTag:
-        games.pop(game,None)
-    i+=1
+    gamesWithTag=getGamesWithTag(tag)
+    matchedGames=matchedGames.intersection(gamesWithTag)
+  games={}
+  for game in matchedGames:
+    games[game] = ratingCache.getGameTagsAveraged(game.name)
   return games
 
 def index(request):
