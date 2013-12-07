@@ -7,7 +7,7 @@ from django.core.cache import cache
 CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
-ratingCache=RatingCache(True)
+ratingCache=RatingCache(False)
 
 #Get all games with tag
 def getGamesWithTag(tag):
