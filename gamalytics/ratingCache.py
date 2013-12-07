@@ -5,8 +5,6 @@ from gamalytics.models import Game,Rating
 from django.core.cache import cache
 from hashlib import md5
 
-CACHE_DURATION=60*60*24
-
 class RatingCache:
   #prepopulate - if true, calculate all games at startup
   def __init__(self, prepopulate):
@@ -14,7 +12,7 @@ class RatingCache:
       count=Game.objects.all().count()
       current=1.0
       for game in Game.objects.all():
-        cache.set(self.getKey(game.name), self.calculateGameAveragedTags(game.name), CACHE_DURATION)
+        cache.set(self.getKey(game.name), self.calculateGameAveragedTags(game.name), 0)
         print('Cache '+str(100*current/count) + '% done, finished '+game.name)
         current += 1
 
@@ -37,5 +35,5 @@ class RatingCache:
     result=cache.get(key)
     if result is None:
       result=self.calculateGameAveragedTags(name)
-      cache.set(key,result,CACHE_DURATION)
+      cache.set(key, result, 0)
     return result

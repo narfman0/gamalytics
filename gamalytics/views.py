@@ -7,7 +7,7 @@ from django.core.cache import cache
 CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
-ratingCache=RatingCache(False)
+ratingCache=RatingCache(True)
 
 #Get all games with tag
 def getGamesWithTag(tag):
@@ -15,7 +15,7 @@ def getGamesWithTag(tag):
   result=cache.get(key)
   if result is None:
     games=[]
-    for rating in Rating.objects.filter(tag__iexact=tag):
+    for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'):
       games.append(rating.game)
     result=set(games)
     cache.set(key, result, CACHE_DURATION)
@@ -58,7 +58,7 @@ def searchTags(query):
   tags.setdefault(0)
   maxValue=.00000001
   for term in query:
-    results=Rating.objects.filter(tag__iexact=term)
+    results=Rating.objects.filter(tag__iexact=term).select_related('game')
     if results.count() > 0:
       matchedTags.append(term)
     for match in results:

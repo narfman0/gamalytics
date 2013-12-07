@@ -113,12 +113,11 @@ WSGI_APPLICATION = 'gamalytics.wsgi.application'
 TEMPLATE_DIRS = (
     os.getcwd()+'/gamalytics/gamalytics/templates',
 )
-print(str(TEMPLATE_DIRS))
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': 'unix:/tmp/memcached.sock',
+        'LOCATION': '127.0.0.1:11211',
     },
 }
 
@@ -131,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'gamalytics',
     'debug_toolbar',
 )
 
