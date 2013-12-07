@@ -8,6 +8,7 @@ from hashlib import md5
 #Stupid memcached. This class checks if memcached is active, if so, uses it.
 #Otherwise it uses a local map.
 class RatingCache:
+  memcachedActive=2
   tagCache={}
   #prepopulate - if true, calculate all games at startup
   def __init__(self, prepopulate):
@@ -38,9 +39,14 @@ class RatingCache:
     return sorted(ratings.items(), key=lambda x: x[1], reverse=True)
   
   def isMemcachedActive(self):
-    key='ismemcachedactivekey'
-    cache.set(key,"value",0)
-    return cache.get(key) != None
+    if self.memcachedActive == 2:
+      key='ismemcachedactivekey'
+      cache.set(key,"value",0)
+      if cache.get(key) == None:
+        self.memcachedActive = 0
+      else:
+        self.memcachedActive = 1
+    return self.memcachedActive == 1
 
   def getGameTagsAveraged(self, name):
     if self.isMemcachedActive():

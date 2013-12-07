@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from gamalytics.models import Game,Rating
 from difflib import SequenceMatcher
-from gamalytics.ratingCache import RatingCache
 from django.core.cache import cache
+from django.shortcuts import render
+from django.views.decorators.cache import cache_page
+from gamalytics.models import Game,Rating
+from gamalytics.ratingCache import RatingCache
 
 CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
@@ -74,6 +75,7 @@ def searchTags(query):
   return (sortedTags,matchedTags,)
 
 #Search games and tags
+@cache_page(CACHE_DURATION)
 def search(request):
   searchString=request.GET['q']
   if ' ' in searchString:
@@ -88,6 +90,7 @@ def search(request):
       'title':'Gamalytics Search - ' + searchString}
   return render(request,'search.html',context)
 
+@cache_page(CACHE_DURATION)
 def game(request, name):
   game=Game.objects.get(name__iexact=name)
   ratings=ratingCache.getGameTagsAveraged(name)
