@@ -92,8 +92,12 @@ def game(request, name):
   released=''
   try:
     released=game.released.strftime('%b. %d, %Y')
+  except:
+    pass
+  try:
     critic,user,criticColor,userColor=getMetacriticScore(game.metacritic)
   except:
+    critic,user,criticColor,userColor=('N/A','N/A','Orange','Orange')
     pass
   context={'game':game, 'ratings':ratings, 'released':released,
       'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name,

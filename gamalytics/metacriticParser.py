@@ -22,6 +22,6 @@ def getColor(score,scale):
   if score >= scale*.6:
     return 'Green'
   elif score >= scale*.5:
-    return 'Yellow'
+    return 'Orange'
   else:
     return 'Red'
