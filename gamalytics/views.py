@@ -1,5 +1,6 @@
 from difflib import SequenceMatcher
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.shortcuts import render,redirect,render_to_response
@@ -9,7 +10,6 @@ from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
 
-CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
@@ -79,7 +79,7 @@ def searchTags(query):
   return (sortedTags,matchedTags,)
 
 #Search games and tags
-@cache_page(CACHE_DURATION)
+@cache_page(60*10)
 def search(request):
   searchString=request.GET['q']
   if ' ' in searchString:
@@ -93,7 +93,7 @@ def search(request):
   context={'games':games, 'tagged':tagged, 'searchString':searchString,'user':request.user}
   return render(request,'search.html',context)
 
-@cache_page(CACHE_DURATION)
+@cache_page(60*10)
 def game(request, name):
   game=Game.objects.get(name__iexact=name)
   ratings=ratingCache.getGameTagsAveraged(name)
@@ -129,7 +129,7 @@ def logout(request):
 def register(request):
   return render(request,'registration/register.html',{'error':'', 'username':''})
 
-def addrating(request):
+def ratingadd(request):
   game=Game.objects.get(id=int(request.POST['game']))
   username=str(request.user)
   tag=request.POST['tag']
@@ -138,7 +138,16 @@ def addrating(request):
   value=float(request.POST['value'])
   Rating.objects.create(username=username, game=game, tag=tag, value=value)
   return redirect('/g/' + game.name)
-  
+
+def ratingremove(request):
+  game=Game.objects.get(id=int(request.GET['game']))
+  tag=request.GET['tag']
+  username=str(request.user)
+  for rating in Rating.objects.filter(username=username, game=game, tag=tag):
+    rating.delete()
+  return redirect('/g/' + game.name)
+
+@login_required
 def registerrequest(request):
   username=request.POST['username']
   password=request.POST['password']

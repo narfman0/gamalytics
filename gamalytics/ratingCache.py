@@ -54,7 +54,7 @@ class RatingCache:
       result=cache.get(key)
       if result is None:
         result=self.calculateGameAveragedTags(name)
-        cache.set(key, result, 0)
+        cache.set(key, result, 60*10)
     else:
       if name not in self.tagCache:
         self.tagCache[name]=self.calculateGameAveragedTags(name)

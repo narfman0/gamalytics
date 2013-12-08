@@ -18,21 +18,27 @@
 Release Date: {{ released }}<br/><br/>
 {% endif %}
 
-Tags:<br/>
-<ul>
+Ratings:</br>
+<table>
+<tr><td>Tag</td><td>Value</td></tr>
 {% for tag,value in ratings %}
-<li><a href="/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
+<tr><td><a href="/s/?q={{tag}}">{{ tag }}</a></td><td>{{ value }}</td></tr>
 {% endfor %}
-</ul>
+</table>
 
 {% if user.is_authenticated %}
-Your tags:<br/>
-<ul>
+Your ratings:<br/>
+<table>
+<tr><td>Tag</td><td>Value</td><td>Delete</td></tr>
 {% for tag,value in userRatings %}
-<li><a href="/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
+<tr>
+<td><a href="/s/?q={{tag}}">{{ tag }}</a></td>
+<td>{{ value }}</td>
+<td><a href="/r/remove?game={{game.id}}&tag={{tag}}">X</a></td>
+</tr>
 {% endfor %}
-</ul>
-Add rating <form action="/addrating/" method="post">
+</table>
+Add rating <form action="/r/add/" method="post">
     {% csrf_token %}
     <select name="tag">
 	<option value="0" selected>Select tag:</option>
