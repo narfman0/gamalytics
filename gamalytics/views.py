@@ -1,10 +1,11 @@
 from difflib import SequenceMatcher
 from django.core.cache import cache
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.cache import cache_page
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
-from gamalytics.metacriticParser import getMetacriticScore
+from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
 
 CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
@@ -103,3 +104,7 @@ def game(request, name):
       'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name,
       'critic':critic,'user':user,'criticColor':criticColor,'userColor':userColor}
   return render(request,'game.html',context)
+
+def update(request):
+  scrapeAll()
+  return HttpResponse('Successful update!')
