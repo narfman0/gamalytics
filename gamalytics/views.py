@@ -51,6 +51,12 @@ def searchGames(query):
     gamesScoreMap[game]=int(SequenceMatcher(None,' '.join(query),game.name).ratio()*100)
   return sorted(gamesScoreMap.items(), key=lambda x: x[1], reverse=True)
 
+def getDistinctTags():
+  tags=[]
+  for rating in Rating.objects.values('tag').distinct():
+    tags.append(rating['tag'])
+  return tags
+
 def searchTags(query):
   tags={}
   matchedTags=[]
@@ -101,9 +107,15 @@ def game(request, name):
   except:
     scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
     pass
+  userRatings={}
+  if request.user.is_authenticated():
+    for rating in Rating.objects.filter(username=request.user.username, game__name=name):
+      userRatings[rating.tag]=rating.value
+  userRatings=sorted(userRatings.items(), key=lambda x: x[1], reverse=True)
   context={'game':game, 'ratings':ratings, 'released':released,
       'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
-      'criticColor':criticColor,'userColor':userColor,'user':request.user}
+      'criticColor':criticColor,'userColor':userColor,'user':request.user,
+      'userRatings':userRatings,'distinctTags':getDistinctTags()}
   return render(request,'game.html',context)
 
 def update(request):
@@ -116,6 +128,16 @@ def logout(request):
 
 def register(request):
   return render(request,'registration/register.html',{'error':'', 'username':''})
+
+def addrating(request):
+  game=Game.objects.get(id=int(request.POST['game']))
+  username=str(request.user)
+  tag=request.POST['tag']
+  for rating in Rating.objects.filter(username=username, tag=tag):
+    rating.delete()
+  value=float(request.POST['value'])
+  Rating.objects.create(username=username, game=game, tag=tag, value=value)
+  return redirect('/g/' + game.name)
   
 def registerrequest(request):
   username=request.POST['username']

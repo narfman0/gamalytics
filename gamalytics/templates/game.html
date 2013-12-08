@@ -25,6 +25,29 @@ Tags:<br/>
 {% endfor %}
 </ul>
 
+{% if user.is_authenticated %}
+Your tags:<br/>
+<ul>
+{% for tag,value in userRatings %}
+<li><a href="/s/?q={{tag}}">{{ tag }}: {{ value }}</a></li>
+{% endfor %}
+</ul>
+Add rating <form action="/addrating/" method="post">
+    {% csrf_token %}
+    <select name="tag">
+	<option value="0" selected>Select tag:</option>
+    {% for tag in distinctTags %}
+	  <option value="{{tag}}">{{tag}}</option>
+    {% endfor %}
+	</select>
+    <label for="id_value">Value:</label>
+    <input id="id_value" type="number" value="" name="value">
+    <input id="id_game" type="hidden" value="{{ game.id }}" name="game">
+    <input type="submit" value="Add">
+  </form>
+{% endif %}
+</br>
+
 Similar Games:<br/>
 <ul>
 {% for similarGame,similarRatings in similar.items %}

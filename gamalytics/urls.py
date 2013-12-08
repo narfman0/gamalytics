@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     (r'^logout/$', views.logout),
     (r'^register/$', views.register),
     (r'^registerrequest/$', views.registerrequest),
+    (r'^addrating/$', views.addrating),
 )
