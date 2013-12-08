@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html>
-{% include 'head.html' %}
-<body>
+{% extends 'base.html' %}
+{% block head %}
+  <title>Gamalytics - {{ game.name }}</title>
+{% endblock %}
+{% block body %}
 {% include 'header.html' %}
 <h1>{{ game.name }}</h1>
 <div>
   <a href="{{ game.metacritic }}">Metacritic</a>
-  Critics: <span class="metacritic{{criticColor}}"><b>{{critic}}</b></span>
-  Users: <span class="metacritic{{userColor}}"><b>{{user}}</b></span>
+  Critics: <span class="metacritic{{criticColor}}"><b>{{ scoreCritic }}</b></span>
+  Users: <span class="metacritic{{userColor}}"><b>{{ scoreUser }}</b></span>
 </div>
 <a href="{{ game.gametrailers }}">Gametrailers</a></br>
 {{ game.description }}
@@ -34,5 +35,4 @@ Similar Games:<br/>
 </li>
 {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block head %}
+  <title>Gamalytics Register</title>
+  {% if message == 'Success' %}
+    <meta http-equiv="refresh" content="5;url=/">
+  {% endif %}
+{% endblock %}
+{% block body %}
+{% include 'header.html' %}
+  <header>
+    <h2>Register</h2>
+  </header>
+  {% if message == 'Success' %}
+    Successfully registered user {{username}}, redirecting <a href='/'>home</a> (in 5 seconds)
+  {% elif message %}
+    Error registering user: {{username}}. {{message}}</br>
+  {% endif %}
+  <form action="/registerrequest/" method="post">
+    {% csrf_token %}
+    <p><label for="id_username">Username:</label>
+    <input id="id_username" type="text" value="{{username}}" name="username"></p>
+    <p><label for="id_password">Password:</label>
+    <input id="id_password" type="password" value="" name="password"></p>
+    <p><label for="id_day">What is the day (number) today:</label>
+    <input id="id_day" type="number" value="" name="day"> (probably EST, you've been warned)</p>
+    <input type="submit" value="Register">
+  </form>
+
+{% endblock %}

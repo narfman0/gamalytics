@@ -1,8 +1,10 @@
 from difflib import SequenceMatcher
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect,render_to_response
 from django.views.decorators.cache import cache_page
+from django.utils import timezone
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
@@ -37,7 +39,7 @@ def getSimilar(ratings):
 
 def index(request):
   games=list(Game.objects.all().order_by('released'))[-10:]
-  context={'games':games, 'genres':GENRES, 'platforms':PLATFORMS, 'title':'Gamalytics'}
+  context={'games':games, 'genres':GENRES, 'platforms':PLATFORMS,'user':request.user}
   return render(request,'index.html',context)
 
 def searchGames(query):
@@ -82,8 +84,7 @@ def search(request):
   for matchedTag in matchedTags:
     searchTerms.remove(matchedTag)
   games=searchGames(searchTerms)
-  context={'games':games, 'tagged':tagged, 'searchString':searchString,
-      'title':'Gamalytics Search - ' + searchString}
+  context={'games':games, 'tagged':tagged, 'searchString':searchString,'user':request.user}
   return render(request,'search.html',context)
 
 @cache_page(CACHE_DURATION)
@@ -96,15 +97,39 @@ def game(request, name):
   except:
     pass
   try:
-    critic,user,criticColor,userColor=getMetacriticScore(game.metacritic)
+    scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
   except:
-    critic,user,criticColor,userColor=('N/A','N/A','Orange','Orange')
+    scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
     pass
   context={'game':game, 'ratings':ratings, 'released':released,
-      'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name,
-      'critic':critic,'user':user,'criticColor':criticColor,'userColor':userColor}
+      'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
+      'criticColor':criticColor,'userColor':userColor,'user':request.user}
   return render(request,'game.html',context)
 
 def update(request):
   scrapeAll()
-  return HttpResponse('Successful update!')
+  return render_to_response('Successful update!')
+
+def logout(request):
+  auth_logout(request)
+  return redirect('/')
+
+def register(request):
+  return render(request,'registration/register.html',{'error':'', 'username':''})
+  
+def registerrequest(request):
+  username=request.POST['username']
+  password=request.POST['password']
+  day=request.POST['day']
+  message=''
+  try:
+    if timezone.now().day != int(day):
+      message='Day not correct, failure!'
+  except:
+    message='Day not a number, failure!'
+  if User.objects.filter(username=username).count() > 0:
+    message='User already registered, failure!'
+  if not message:
+    User.objects.create_user(username=username, password=password)
+    message='Success'
+  return render(request,'registration/register.html',{'message':message, 'username':username})

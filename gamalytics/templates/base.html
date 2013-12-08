@@ -1,5 +1,7 @@
-<head>
-  <style type="text/css">
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
 body{color:white; background-color:#282828; font-family:Helvetica,Arial;}
 h1{color:darkorange;}
 a{color:darkorange; text-decoration:none}
@@ -9,6 +11,10 @@ a:hover{color:orange; text-decoration:underline}
 .metacriticGreen{background-color:green; padding:.5%;}
 .metacriticOrange{background-color:orange; padding:.5%;}
 .metacriticLightGray{background-color:lightgray; padding:.5%;}
-  </style>
-  <title>{{title}}</title>
-</head>
+    </style>
+  {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% block body %}{% endblock %}
+  </body>
+</html>
