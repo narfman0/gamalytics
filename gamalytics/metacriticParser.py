@@ -13,13 +13,21 @@ def getMetacriticScore(url):
   result=cache.get(url)
   if result is None:
     soup=parse(url)
-    critic=int(soup.find('span',{'itemprop':'ratingValue'}).string)
-    user=float(soup.find('div',{'class':'metascore_w user large game positive'}).string)
+    try:
+      critic=int(soup.find('span',{'itemprop':'ratingValue'}).string)
+    except:
+      critic='tbd'
+    try:
+      user=float(soup.find('div',{'class':'metascore_w user large game positive'}).string)
+    except:
+      user='tbd'
     result=(critic,user,getColor(critic,100),getColor(user,10))
   return result
 
 def getColor(score,scale):
-  if score >= scale*.6:
+  if isinstance(score, basestring):
+    return 'LightGray'
+  elif score >= scale*.6:
     return 'Green'
   elif score >= scale*.5:
     return 'Orange'
