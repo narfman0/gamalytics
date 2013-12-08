@@ -4,7 +4,11 @@
 <body>
 {% include 'header.html' %}
 <h1>{{ game.name }}</h1>
-<a href="{{ game.metacritic }}">Metacritic</a></br>
+<div>
+  <a href="{{ game.metacritic }}">Metacritic</a>
+  Critics: <span class="metacritic{{criticColor}}"><b>{{critic}}</b></span>
+  Users: <span class="metacritic{{userColor}}"><b>{{user}}</b></span>
+</div>
 <a href="{{ game.gametrailers }}">Gametrailers</a></br>
 {{ game.description }}
 <br/><br/>
@@ -25,8 +29,9 @@ Similar Games:<br/>
 {% for similarGame,similarRatings in similar.items %}
 <li><a href="/g/{{ similarGame.name }}">{{ similarGame.name }}</a>:
 {% for tag,value in similarRatings %}
- {{ tag }}: {{ value }}</li>
+ {{ tag }}: {{ value }}
 {% endfor %}
+</li>
 {% endfor %}
 </ul>
 </body>

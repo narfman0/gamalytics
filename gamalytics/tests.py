@@ -1,5 +1,6 @@
 from django.test import TestCase
 from gamalytics.models import Game,Rating
+from gamalytics.metacriticParser import getMetacriticScore
 from ratingCache import RatingCache
 from django.utils import timezone
 
@@ -27,3 +28,10 @@ class RatingCacheTest(TestCase):
     for tag,value in tags:
       self.assertEqual(tag,'pc')
       self.assertEqual(value,50)
+
+  def test_metacritic_parser(self):
+    url='http://www.metacritic.com/game/xbox-360/dead-or-alive-4'
+    scores=getMetacriticScore(url)
+    self.assertEqual(len(scores),4)
+    self.assertTrue(scores[0] > 60 and scores[0] < 90)
+    self.assertTrue(scores[1] > 6 and scores[1] < 9)

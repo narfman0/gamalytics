@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views.decorators.cache import cache_page
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
+from gamalytics.metacriticParser import getMetacriticScore
 
 CACHE_DURATION=60*60*24
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
@@ -91,8 +92,10 @@ def game(request, name):
   released=''
   try:
     released=game.released.strftime('%b. %d, %Y')
+    critic,user,criticColor,userColor=getMetacriticScore(game.metacritic)
   except:
     pass
   context={'game':game, 'ratings':ratings, 'released':released,
-      'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name}
+      'similar':getSimilar(ratings), 'title':'Gamalytics - ' + name,
+      'critic':critic,'user':user,'criticColor':criticColor,'userColor':userColor}
   return render(request,'game.html',context)
