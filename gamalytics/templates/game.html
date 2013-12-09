@@ -64,7 +64,7 @@ Similar Games:<br/>
 <tr>
  <td><a href="/g/{{ similarGame.name }}">{{ similarGame.name }}</a></td>
  {% for tag,value in similarRatings %}
- <td><span class="rating"><a href="/s/?q={{tag}}">{{ tag }}</a>: {{ value }}</span></td>
+ <td><span class="rating"><a href="/s/?q={{tag}}">{{ tag }}</a>:{{ value }}</span></td>
  {% endfor %}
 </tr>
 {% endfor %}
