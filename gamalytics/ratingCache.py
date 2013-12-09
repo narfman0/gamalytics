@@ -29,7 +29,7 @@ class RatingCache:
     ratings={}
     for k,v in ratingMap.items():
       ratings[k]=int(sum(v)/len(v))
-    return sorted(ratings.items(), key=lambda x: x[1], reverse=True)
+    return sorted(ratings.items(), key=lambda x: x[0], reverse=True)
   
   def getGameTagsAveraged(self, name):
     key=self.getKey(name)

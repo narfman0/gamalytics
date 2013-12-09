@@ -13,6 +13,10 @@ GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platfor
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
 
+#Return string formatted to how registration pages want it
+def getCurrentRegistrationTimeString():
+  return timezone.now().strftime('%b %d, %Y')
+
 #Get all games with tag
 def getGamesWithTag(tag):
   key=ratingCache.getKey(tag)
@@ -131,7 +135,8 @@ def logout(request):
   return redirect('/')
 
 def register(request):
-  return render(request,'registration/register.html',{'error':'', 'username':''})
+  return render(request,'registration/register.html',{'error':'', 'username':'',
+      'time':getCurrentRegistrationTimeString()})
 
 def ratingadd(request):
   game=Game.objects.get(id=int(request.POST['game']))
@@ -168,4 +173,5 @@ def registerrequest(request):
   if not message:
     User.objects.create_user(username=username, password=password)
     message='Success'
-  return render(request,'registration/register.html',{'message':message, 'username':username})
+  return render(request,'registration/register.html',{'message':message, 
+      'username':username, 'time':getCurrentRegistrationTimeString()})
