@@ -152,8 +152,8 @@ def ratingremove(request):
     rating.delete()
   return redirect('/g/' + game.name)
 
-@login_required
 def registerrequest(request):
+  print(str(request.POST))
   username=request.POST['username']
   password=request.POST['password']
   day=request.POST['day']
