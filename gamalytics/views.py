@@ -90,7 +90,7 @@ def searchTags(query):
 #Search games and tags
 def search(request):
   searchString=request.GET['q']
-  key=ratingCache.getKey(searchString)
+  key=ratingCache.getKey('search' + searchString)
   result=cache.get(key)
   if result is None:
     if ' ' in searchString:
