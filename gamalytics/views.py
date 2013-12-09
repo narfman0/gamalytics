@@ -9,7 +9,7 @@ from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
 
-CACHE_DURATION=60*10
+CACHE_DURATION=60*5
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
@@ -23,7 +23,7 @@ def getGamesWithTag(tag):
     for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'):
       games.append(rating.game)
     result=set(games)
-    cache.set(key, result, 0)
+    cache.set(key, result, CACHE_DURATION)
   return result
 
 #Return a list of similar games along with how similar they are
@@ -100,32 +100,27 @@ def search(request):
   return render(request,'search.html',context)
 
 def game(request, name):
-  key=ratingCache.getKey(name)
-  context=cache.get(key)
-  if context is None:
-    game=Game.objects.get(name__iexact=name)
-    ratings=ratingCache.getGameTagsAveraged(name)
-    released=''
-    try:
-      released=game.released.strftime('%b. %d, %Y')
-    except:
-      pass
-    try:
-      scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
-    except:
-      scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
-      pass
-    context={'game':game, 'ratings':ratings, 'released':released,
-        'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
-        'criticColor':criticColor,'userColor':userColor,'distinctTags':getDistinctTags()}
-    cache.set(key, context, CACHE_DURATION)
+  game=Game.objects.get(name__iexact=name)
+  ratings=ratingCache.getGameTagsAveraged(name)
+  released=''
+  try:
+    released=game.released.strftime('%b. %d, %Y')
+  except:
+    pass
+  try:
+    scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
+  except:
+    scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
+    pass
   userRatings={}
   if request.user.is_authenticated():
     for rating in Rating.objects.filter(username=request.user.username, game__name=name):
       userRatings[rating.tag]=rating.value
   userRatings=sorted(userRatings.items(), key=lambda x: x[1], reverse=True)
-  context['userRatings']=userRatings
-  context['user']=request.user
+  context={'game':game, 'ratings':ratings, 'released':released,
+      'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
+      'criticColor':criticColor,'userColor':userColor,'user':request.user,
+      'userRatings':userRatings,'distinctTags':getDistinctTags()}
   return render(request,'game.html',context)
 
 def update(request):
