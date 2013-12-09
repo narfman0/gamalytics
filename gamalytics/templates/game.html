@@ -15,53 +15,58 @@
 <br/><br/>
 
 {% if released != '' %}
-Release Date: {{ released }}<br/><br/>
+Release Date: {{ released }}<br/>
 {% endif %}
 
-Ratings:</br>
 <table>
-<tr><td>Tag</td><td>Value</td></tr>
-{% for tag,value in ratings %}
-<tr><td><a href="/s/?q={{tag}}">{{ tag }}</a></td><td>{{ value }}</td></tr>
-{% endfor %}
+ <tr>
+  <td>Ratings:</td>
+  {% for tag,value in ratings %}
+  <td><span class="rating"><a href="/s/?q={{tag}}">{{ tag }}</a>: {{ value }}</span></td> 
+  {% endfor %}
+ </tr>
 </table>
 
 {% if user.is_authenticated %}
-Your ratings:<br/>
+ {% if userRatings %}
+ <table>
+  <tr>
+   <td>Your Ratings:</td>
+   {% for tag,value in userRatings %}
+   <td><span class="rating">
+   <a href="/s/?q={{tag}}">{{ tag }}</a>: {{ value }} 
+   <a href="/r/remove?game={{game.id}}&tag={{tag}}"> X</a></span></td> 
+   {% endfor %}
+  </tr>
+ </table>
+ {% endif %}
+
+<form action="/r/add/" method="post">
+  {% csrf_token %}
+  <label for="tag">Add rating</label>
+  <select name="tag">
+  <option value="0" selected>Select tag:</option>
+  {% for tag in distinctTags %}
+    <option value="{{tag}}">{{tag}}</option>
+  {% endfor %}
+  </select>
+  <label for="id_value">Value:</label>
+  <input id="id_value" type="number" value="" name="value" maxlength="5" size="5">
+  <input id="id_game" type="hidden" value="{{ game.id }}" name="game">
+  <input type="submit" value="Add">
+</form>
+</br>
+{% endif %}
+
+Similar Games:<br/>
 <table>
-<tr><td>Tag</td><td>Value</td><td>Delete</td></tr>
-{% for tag,value in userRatings %}
+{% for similarGame,similarRatings in similar.items %}
 <tr>
-<td><a href="/s/?q={{tag}}">{{ tag }}</a></td>
-<td>{{ value }}</td>
-<td><a href="/r/remove?game={{game.id}}&tag={{tag}}">X</a></td>
+ <td><a href="/g/{{ similarGame.name }}">{{ similarGame.name }}</a></td>
+ {% for tag,value in similarRatings %}
+ <td><span class="rating"><a href="/s/?q={{tag}}">{{ tag }}</a>: {{ value }}</span></td>
+ {% endfor %}
 </tr>
 {% endfor %}
 </table>
-Add rating <form action="/r/add/" method="post">
-    {% csrf_token %}
-    <select name="tag">
-	<option value="0" selected>Select tag:</option>
-    {% for tag in distinctTags %}
-	  <option value="{{tag}}">{{tag}}</option>
-    {% endfor %}
-	</select>
-    <label for="id_value">Value:</label>
-    <input id="id_value" type="number" value="" name="value">
-    <input id="id_game" type="hidden" value="{{ game.id }}" name="game">
-    <input type="submit" value="Add">
-  </form>
-{% endif %}
-</br>
-
-Similar Games:<br/>
-<ul>
-{% for similarGame,similarRatings in similar.items %}
-<li><a href="/g/{{ similarGame.name }}">{{ similarGame.name }}</a>:
-{% for tag,value in similarRatings %}
- {{ tag }}: {{ value }}
-{% endfor %}
-</li>
-{% endfor %}
-</ul>
 {% endblock %}

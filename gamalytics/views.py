@@ -1,6 +1,5 @@
 from difflib import SequenceMatcher
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.shortcuts import render,redirect,render_to_response
@@ -115,7 +114,7 @@ def game(request, name):
   userRatings={}
   if request.user.is_authenticated():
     for rating in Rating.objects.filter(username=request.user.username, game__name=name):
-      userRatings[rating.tag]=rating.value
+      userRatings[rating.tag]=int(rating.value)
   userRatings=sorted(userRatings.items(), key=lambda x: x[1], reverse=True)
   context={'game':game, 'ratings':ratings, 'released':released,
       'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
@@ -138,10 +137,11 @@ def ratingadd(request):
   game=Game.objects.get(id=int(request.POST['game']))
   username=str(request.user)
   tag=request.POST['tag']
-  for rating in Rating.objects.filter(username=username, tag=tag):
+  for rating in Rating.objects.filter(username=username, tag=tag, game=game):
     rating.delete()
   value=float(request.POST['value'])
   Rating.objects.create(username=username, game=game, tag=tag, value=value)
+  ratingCache.invalidate(game)
   return redirect('/g/' + game.name)
 
 def ratingremove(request):
@@ -150,10 +150,10 @@ def ratingremove(request):
   username=str(request.user)
   for rating in Rating.objects.filter(username=username, game=game, tag=tag):
     rating.delete()
+  ratingCache.invalidate(game)
   return redirect('/g/' + game.name)
 
 def registerrequest(request):
-  print(str(request.POST))
   username=request.POST['username']
   password=request.POST['password']
   day=request.POST['day']

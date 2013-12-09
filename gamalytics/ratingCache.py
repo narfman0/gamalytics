@@ -28,7 +28,7 @@ class RatingCache:
       ratingMap[rating.tag]=s
     ratings={}
     for k,v in ratingMap.items():
-      ratings[k]=sum(v)/len(v)
+      ratings[k]=int(sum(v)/len(v))
     return sorted(ratings.items(), key=lambda x: x[1], reverse=True)
   
   def getGameTagsAveraged(self, name):
@@ -36,5 +36,8 @@ class RatingCache:
     result=cache.get(key)
     if result is None:
       result=self.calculateGameAveragedTags(name)
-      cache.set(key, result, 60*10)
+      cache.set(key, result, 0)
     return result
+
+  def invalidate(self, game):
+    cache.delete(self.getKey(game.name))
