@@ -60,7 +60,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(PROJECT_PATH + '/../static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -118,6 +118,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
+        #'LOCATION': 'pub-memcache-14392.us-east-1-1.1.ec2.garantiadata.com:14392',
     },
 }
 
