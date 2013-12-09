@@ -5,6 +5,9 @@
 {% block body %}
 {% include 'header.html' %}
 <h1>Page not found</h1>
+{% if message %}
+  <h2>{{message}}</h2>
+{% endif %}
 <p>Looks like it's noob hour - the page you requested could not be found.
 Don't redial, it is really not here. Go <a href='/'>home</a>, search, or
 pick better life <a href="http://www.youtube.com/watch?v=e4lGldoXP6A">activities</a>.</p>
