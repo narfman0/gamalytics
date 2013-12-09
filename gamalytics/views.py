@@ -4,12 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.shortcuts import render,redirect,render_to_response
-from django.views.decorators.cache import cache_page
 from django.utils import timezone
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
 
+CACHE_DURATION=60*10
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
@@ -79,43 +79,53 @@ def searchTags(query):
   return (sortedTags,matchedTags,)
 
 #Search games and tags
-@cache_page(60*10)
 def search(request):
   searchString=request.GET['q']
-  if ' ' in searchString:
-    searchTerms=searchString.split()
+  key=ratingCache.getKey(searchString)
+  result=cache.get(key)
+  if result is None:
+    if ' ' in searchString:
+      searchTerms=searchString.split()
+    else:
+      searchTerms=[searchString]
+    tagged,matchedTags=searchTags(searchTerms)
+    for matchedTag in matchedTags:
+      searchTerms.remove(matchedTag)
+    games=searchGames(searchTerms)
+    result=(games,tagged)
+    cache.set(key, result, CACHE_DURATION)
   else:
-    searchTerms=[searchString]
-  tagged,matchedTags=searchTags(searchTerms)
-  for matchedTag in matchedTags:
-    searchTerms.remove(matchedTag)
-  games=searchGames(searchTerms)
+    games,tagged=result
   context={'games':games, 'tagged':tagged, 'searchString':searchString,'user':request.user}
   return render(request,'search.html',context)
 
-@cache_page(60*10)
 def game(request, name):
-  game=Game.objects.get(name__iexact=name)
-  ratings=ratingCache.getGameTagsAveraged(name)
-  released=''
-  try:
-    released=game.released.strftime('%b. %d, %Y')
-  except:
-    pass
-  try:
-    scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
-  except:
-    scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
-    pass
+  key=ratingCache.getKey(name)
+  context=cache.get(key)
+  if context is None:
+    game=Game.objects.get(name__iexact=name)
+    ratings=ratingCache.getGameTagsAveraged(name)
+    released=''
+    try:
+      released=game.released.strftime('%b. %d, %Y')
+    except:
+      pass
+    try:
+      scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
+    except:
+      scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
+      pass
+    context={'game':game, 'ratings':ratings, 'released':released,
+        'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
+        'criticColor':criticColor,'userColor':userColor,'distinctTags':getDistinctTags()}
+    cache.set(key, context, CACHE_DURATION)
   userRatings={}
   if request.user.is_authenticated():
     for rating in Rating.objects.filter(username=request.user.username, game__name=name):
       userRatings[rating.tag]=rating.value
   userRatings=sorted(userRatings.items(), key=lambda x: x[1], reverse=True)
-  context={'game':game, 'ratings':ratings, 'released':released,
-      'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
-      'criticColor':criticColor,'userColor':userColor,'user':request.user,
-      'userRatings':userRatings,'distinctTags':getDistinctTags()}
+  context['userRatings']=userRatings
+  context['user']=request.user
   return render(request,'game.html',context)
 
 def update(request):
