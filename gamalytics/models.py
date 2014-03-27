@@ -8,6 +8,7 @@ class Game(models.Model):
     gametrailers = models.URLField()
     description = models.TextField()
     released = models.DateTimeField(db_index=True, default=datetime.now)
+    lastUpdated = models.DateTimeField(default=datetime.now)
     def __unicode__(self):
       return '[Game: name=' + self.name + ']'
 
