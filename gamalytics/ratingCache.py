@@ -4,8 +4,11 @@
 from gamalytics.models import Game,Rating
 from django.core.cache import cache
 from hashlib import md5
+import logging
 
 class RatingCache:
+  LOGGER = logging.getLogger(__name__)
+  
   #prepopulate - if true, calculate all games at startup
   def __init__(self, prepopulate):
     if prepopulate:
@@ -14,7 +17,7 @@ class RatingCache:
       for game in Game.objects.all():
         tags=self.calculateGameAveragedTags(game.name)
         cache.set(self.getKey(game.name), tags, 0)
-        print('Cache '+str(100*current/count) + '% done, finished '+game.name)
+        self.LOGGER.info('Cache '+str(100*current/count) + '% done, finished '+game.name)
         current += 1
 
   def getKey(self,name):
@@ -40,4 +43,5 @@ class RatingCache:
     return result
 
   def invalidate(self, game):
+    self.LOGGER.info('Invalidating ratings for game ' + game)
     cache.delete(self.getKey(game.name))

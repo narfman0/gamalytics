@@ -4,8 +4,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.cache import cache
 from gamalytics.models import Game,Rating
-import urllib2
-import traceback
+import logging, traceback, urllib2
 
 BASE_URL='http://www.metacritic.com'
 TEMPLATE_GENRE_URL=BASE_URL + '/browse/games/genre/metascore/GENRE/PLATFORM?view=condensed&page=PAGE'
@@ -15,6 +14,7 @@ GENRES=('action','adventure','fighting','first-person','flight',
 PLATFORM_MAP={'pc':'pc', 'ps4':'playstation-4', 'ps3':'playstation-3', 
   'xboxone':'xbox-one','xbox360':'xbox-360','wii-u':'wii-u','3ds':'3ds',
   'ios':'ios'}
+LOGGER = logging.getLogger(__name__)
 
 def parse(link):
   response = urllib2.urlopen(link)
@@ -77,7 +77,7 @@ def parseGame(url,gamename):
   try:
     summary=parseSummary(soup)
   except:
-    print('Failed to parse ' + gamename)
+    LOGGER.error('Failed to parse ' + gamename)
     traceback.print_exc()
     pass 
   return (summary,getTime(published))
@@ -86,7 +86,7 @@ def getTime(time):
   try:
     return timezone.get_current_timezone().localize(datetime.strptime(time, '%b %d, %Y'))
   except:
-    print('Exception converting time ' + time)
+    LOGGER.error('Exception converting time ' + time)
     traceback.print_exc()
     return timezone.now()
 
@@ -99,7 +99,7 @@ def getGameURLs(games,tags,genre,platform):
   while True:
     url=TEMPLATE_GENRE_URL.replace('GENRE',genre).replace('PAGE',str(x)).replace('PLATFORM',platform)
     x+=1
-    print('Getting URL: ' + url)
+    LOGGER.info('Getting URL: ' + url)
     try:
       soup=parse(url)
       if not isValid(soup):
@@ -127,7 +127,7 @@ def parseGameURL(name,url):
   try:
     summary,published=parseGame(url,name)
   except:
-    print('Error encountered on: ' + name + ' with url: ' + url)
+    LOGGER.error('Error encountered on: ' + name + ' with url: ' + url)
     summary=''
     published=timezone.now()
     pass
@@ -146,11 +146,14 @@ def scrapeAll():
     dbGames[game.name]=game
   for gamename,link in games.iteritems():
     if gamename not in dbGames:
-      print('Adding game to db: ' + gamename)
+      LOGGER.info('Adding game to db: ' + gamename)
       name,url,summary,published=parseGameURL(gamename,link)
       game=Game.objects.create(name=name, metacritic=url, gametrailers='gametrailers.com', 
                                description=summary, released=published)
       #add urls
       for tag in tags[name]:
         Rating.objects.create(username='narfman0',game=game,tag=tag,value=100,time=timezone.now())
-  print('Finished scrape in time: ' + str(timezone.now()-startTime))
+    elif dbGames[gamename].released > dbGames[gamename].lastUpdated and \
+        dbGames[gamename].released < timezone.now():
+      LOGGER.info('Should update game in db: ' + gamename)
+  LOGGER.info('Finished scrape in time: ' + str(timezone.now()-startTime))

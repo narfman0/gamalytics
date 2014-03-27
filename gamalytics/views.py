@@ -13,7 +13,7 @@ CACHE_DURATION=60*5
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 #Return string formatted to how registration pages want it
 def getCurrentRegistrationTimeString():
@@ -40,7 +40,7 @@ def getSimilar(ratings):
       matchedGames=matchedGames.intersection(gamesWithTag)
   else:
     matchedGames=set()
-    logger.error('views.getSimilar: ratings empty')
+    LOGGER.error('views.getSimilar: ratings empty')
   games={}
   for game in matchedGames:
     games[game] = ratingCache.getGameTagsAveraged(game.name)
@@ -114,7 +114,7 @@ def game(request, name):
     game=Game.objects.get(name__iexact=name)
   except:
     msg='views.game: Failed to find game with name ' + name
-    logger.error(msg)
+    LOGGER.error(msg)
     return render(request,'404.html',{'message':msg})
   #get ratings/info
   ratings=ratingCache.getGameTagsAveraged(name)
