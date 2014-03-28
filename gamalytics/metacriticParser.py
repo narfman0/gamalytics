@@ -4,7 +4,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.cache import cache
 from gamalytics.models import Game,Rating
-import logging, traceback, urllib2
+import gametrailersScraper, logging, traceback, urllib2
 
 BASE_URL='http://www.metacritic.com'
 TEMPLATE_GENRE_URL=BASE_URL + '/browse/games/genre/metascore/GENRE/PLATFORM?view=condensed&page=PAGE'
@@ -131,7 +131,7 @@ def parseGameURL(name,url):
     summary=''
     published=timezone.now()
     pass
-  return (name,url,summary,published)
+  return (name,BASE_URL+url,summary,published)
 
 def scrapeAll():
   games={}
@@ -148,8 +148,16 @@ def scrapeAll():
     if gamename not in dbGames:
       LOGGER.info('Adding game to db: ' + gamename)
       name,url,summary,published=parseGameURL(gamename,link)
-      game=Game.objects.create(name=name, metacritic=url, gametrailers='gametrailers.com', 
-                               description=summary, released=published)
+      reviewURL=''
+      reviewVideo=''
+      try:
+        reviewURL,reviewVideo=gametrailersScraper.getGametrailersInfo(name)
+      except:
+        LOGGER.error('Error retrieving review urls for: ' + name)
+        traceback.print_exc()
+      game=Game.objects.create(name=name, metacritic=url, gametrailersReviewURL=reviewURL,
+                               gametrailersVideo=reviewVideo, description=summary, 
+                               released=published, lastUpdated=timezone.now())
       #add urls
       for tag in tags[name]:
         Rating.objects.create(username='narfman0',game=game,tag=tag,value=100,time=timezone.now())

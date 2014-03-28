@@ -10,7 +10,7 @@
   Critics: <span class="metacritic{{criticColor}}"><b>{{ scoreCritic }}</b></span>
   Users: <span class="metacritic{{userColor}}"><b>{{ scoreUser }}</b></span>
 </div>
-<a href="{{ game.gametrailers }}">Gametrailers</a></br>
+<a href="{{ game.gametrailersReviewURL }}">Gametrailers</a></br>
 {{ game.description }}
 <br/><br/>
 
@@ -56,6 +56,14 @@ Release Date: {{ released }}<br/>
   <input type="submit" value="Add">
 </form>
 </br>
+{% endif %}
+
+{% if game.gametrailersVideo %}
+<video width="512" height="288" controls>
+  <object data="{{ game.gametrailersVideo }}" width="512" height="288">
+    <embed src="{{ game.gametrailersVideo }}" width="512" height="288">
+  </object>
+</video><br/>
 {% endif %}
 
 Similar Games:<br/>
