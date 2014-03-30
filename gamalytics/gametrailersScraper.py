@@ -31,10 +31,10 @@ def getGametrailersInfo(game):
   try:
     url=parseReviewURL(game)
     video=parseReviewEmbed(url)
-    if (not url None) and (not video None):
+    if not url is None and not video is None:
       LOGGER.info('Gametrailers URL found for game: ' + game)
       return (url,video)
-    else
+    else:
       LOGGER.warning('Gametrailers URL(s) null for game: ' + game)
   except:
     LOGGER.error('Error retrieving gametrailers urls for: ' + game)
