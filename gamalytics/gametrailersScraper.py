@@ -1,6 +1,7 @@
 #!/bin/python
 from bs4 import BeautifulSoup
 import logging, urllib2
+import traceback
 LOGGER = logging.getLogger(__name__)
 
 def parse(link):
@@ -18,15 +19,27 @@ def parseReviewURL(game):
   return None
 
 def parseReviewEmbed(url):
+  if url is None:
+    LOGGER.warning('Url None, skipping parse review')
+    return None
   LOGGER.info('Parsing gametrailers embedded review URL from: ' + url)
   soup=parse(url)
   dataVideo = soup.find('div', {'class':'download_button'})['data-video']
   return 'http://media.mtvnservices.com/embed/' + dataVideo
 
 def getGametrailersInfo(game):
-  url=parseReviewURL(game)
-  video=parseReviewEmbed(url)
-  return (url, video)
+  try:
+    url=parseReviewURL(game)
+    video=parseReviewEmbed(url)
+    if (not url None) and (not video None):
+      LOGGER.info('Gametrailers URL found for game: ' + game)
+      return (url,video)
+    else
+      LOGGER.warning('Gametrailers URL(s) null for game: ' + game)
+  except:
+    LOGGER.error('Error retrieving gametrailers urls for: ' + game)
+    traceback.print_exc()
+  return ('','')
 
 if __name__ == '__main__':
   url=parseReviewURL('Titanfall')
