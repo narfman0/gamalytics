@@ -59,11 +59,7 @@ Release Date: {{ released }}<br/>
 {% endif %}
 
 {% if game.gametrailersVideo %}
-<video width="512" height="288" controls>
-  <object data="{{ game.gametrailersVideo }}" width="512" height="288">
-    <embed src="{{ game.gametrailersVideo }}" width="512" height="288">
-  </object>
-</video><br/>
+<div><iframe src="http://{{ game.gametrailersVideo }}" width="512" height="288" frameborder="0"></iframe></div>
 {% endif %}
 
 Similar Games:<br/>
