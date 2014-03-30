@@ -147,6 +147,9 @@ def logout(request):
   auth_logout(request)
   return redirect('/')
 
+def logs(request):
+  return render(request,'logs.html',{'logs':(line.rstrip('\n') for line in open('gamalytics.log'))})
+
 def register(request):
   return render(request,'registration/register.html',{'error':'', 'username':'',
       'time':getCurrentRegistrationTimeString()})

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block head %}
+  <title>Gamalytics logs</title>
+{% endblock %}
+{% block body %}
+{% include 'header.html' %}
+<ul>
+  {% for log in logs %}
+  <li>{{ log }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
