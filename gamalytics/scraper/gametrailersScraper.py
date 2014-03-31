@@ -1,7 +1,6 @@
 #!/bin/python
 from bs4 import BeautifulSoup
-import logging, urllib2
-import traceback
+import logging, traceback, urllib2
 LOGGER = logging.getLogger(__name__)
 
 def parse(link):

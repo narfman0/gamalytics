@@ -6,7 +6,7 @@ from django.shortcuts import render,redirect,render_to_response
 from django.utils import timezone
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
-from gamalytics.metacriticParser import getMetacriticScore,scrapeAll
+from gamalytics.scraper import scraperManager, metacriticScraper
 import logging
 
 CACHE_DURATION=60*5
@@ -124,7 +124,7 @@ def game(request, name):
   except:
     pass
   try:
-    scoreCritic,scoreUser,criticColor,userColor=getMetacriticScore(game.metacritic)
+    scoreCritic,scoreUser,criticColor,userColor=metacriticScraper.getMetacriticScore(game.metacritic)
   except:
     scoreCritic,scoreUser,criticColor,userColor=('N/A','N/A','Orange','Orange')
     pass
@@ -140,7 +140,7 @@ def game(request, name):
   return render(request,'game.html',context)
 
 def update(request):
-  scrapeAll()
+  scraperManager.scrape()
   return render_to_response('Successful update!')
 
 def logout(request):

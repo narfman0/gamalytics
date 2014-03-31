@@ -3,8 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from django.utils import timezone
 from django.core.cache import cache
-from gamalytics.models import Game,Rating
-import gametrailersScraper, logging, traceback, urllib2
+import logging, traceback, urllib2
 
 BASE_URL='http://www.metacritic.com'
 TEMPLATE_GENRE_URL=BASE_URL + '/browse/games/genre/metascore/GENRE/PLATFORM?view=condensed&page=PAGE'
@@ -133,29 +132,10 @@ def parseGameURL(name,url):
     pass
   return (name,BASE_URL+url,summary,published)
 
-def scrapeAll():
+def scrapeGamesAndTags():
   games={}
   tags={}
-  startTime=timezone.now()
   for genre in GENRES:
     for platform in PLATFORM_MAP.keys():
       getGameURLs(games,tags,genre,platform)
-  #add games
-  dbGames={}
-  for game in list(Game.objects.all()):
-    dbGames[game.name]=game
-  for gamename,link in games.iteritems():
-    if gamename not in dbGames:
-      LOGGER.info('Adding game to db: ' + gamename)
-      name,url,summary,published=parseGameURL(gamename,link)
-      reviewURL,reviewVideo=gametrailersScraper.getGametrailersInfo(name)
-      game=Game.objects.create(name=name, metacritic=url, gametrailersReviewURL=reviewURL,
-                               gametrailersVideo=reviewVideo, description=summary, 
-                               released=published, lastUpdated=timezone.now())
-      #add urls
-      for tag in tags[name]:
-        Rating.objects.create(username='narfman0',game=game,tag=tag,value=100,time=timezone.now())
-    elif dbGames[gamename].released > dbGames[gamename].lastUpdated and \
-        dbGames[gamename].released < timezone.now():
-      LOGGER.info('Should update game in db: ' + gamename)
-  LOGGER.info('Finished scrape in time: ' + str(timezone.now()-startTime))
+  return (games,tags)
