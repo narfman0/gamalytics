@@ -16,7 +16,7 @@ class RatingCache:
       count=Game.objects.all().count()
       current=1.0
       for game in Game.objects.all():
-        tags=self.calculateGameAveragedTags(game.name)
+        tags=self.calculateGameAveragedTagsSorted(game.name)
         cache.set(self.getKey(game.name), tags, 0)
         self.LOGGER.info('Cache '+str(100*current/count) + '% done, finished '+game.name)
         current += 1
@@ -24,7 +24,7 @@ class RatingCache:
   def getKey(self,name):
     return md5(name).hexdigest()
 
-  def calculateGameAveragedTags(self, name):
+  def calculateGameAveragedTagsMap(self, name):
     ratingMap={}
     for rating in Rating.objects.filter(game__name__iexact=name):
       s=ratingMap.get(rating.tag,[])
@@ -33,6 +33,10 @@ class RatingCache:
     ratings={}
     for k,v in ratingMap.items():
       ratings[k]=int(sum(v)/len(v))
+    return ratings
+
+  def calculateGameAveragedTagsSorted(self, name):
+    ratings=self.calculateGameAveragedTagsMap(name)
     return sorted(ratings.items(), key=lambda x: x[0], reverse=True)
   
   def getGameTagsAveraged(self, name):
@@ -40,7 +44,7 @@ class RatingCache:
     result=cache.get(key)
     if result is None:
       start=timezone.now()
-      result=self.calculateGameAveragedTags(name)
+      result=self.calculateGameAveragedTagsSorted(name)
       cache.set(key, result, 0)
       self.LOGGER.info('Calculated tags for ' + name + ' in: ' + str(timezone.now()-start))
     else:

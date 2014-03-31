@@ -1,8 +1,9 @@
 from django.test import TestCase
 from gamalytics.models import Game,Rating
-from gamalytics.metacriticParser import getMetacriticScore
 from ratingCache import RatingCache
 from django.utils import timezone
+from gamalytics.scraper.metacriticScraper import getMetacriticScore
+import unittest
 
 class RatingCacheTest(TestCase):
   def setUp(self):
@@ -37,3 +38,6 @@ class RatingCacheTest(TestCase):
     self.assertEqual(len(scores),4)
     self.assertTrue(scores[0] > 60 and scores[0] < 90)
     self.assertTrue(scores[1] > 6 and scores[1] < 9)
+
+if __name__ == "__main__":
+    unittest.main()
