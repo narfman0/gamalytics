@@ -17,25 +17,14 @@ LOGGER = logging.getLogger(__name__)
 def getCurrentRegistrationTimeString():
   return timezone.now().strftime('%b %d, %Y')
 
-#Get all games with tag
-def getGamesWithTag(tag):
-  key=ratingCache.getKey(tag)
-  result=cache.get(key)
-  if result is None:
-    start=timezone.now()
-    result=set(rating.game for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'))
-    cache.set(key, result)
-    LOGGER.info('Got games with tag ' + tag + ' in: ' + str(timezone.now()-start))
-  return result
-
 #Return a list of similar games along with how similar they are
 def getSimilar(ratings):
   start=timezone.now()
   matchedGames=set(Game.objects.all())
   if len(ratings) > 0:
     for tag,_value in ratings:
-      gamesWithTag=getGamesWithTag(tag)
-      matchedGames=matchedGames.intersection(gamesWithTag)
+      gamesTag=set(rating.game for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'))
+      matchedGames=matchedGames.intersection(gamesTag)
   else:
     matchedGames=set()
     LOGGER.error('Ratings empty')
