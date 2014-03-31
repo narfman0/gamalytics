@@ -5,7 +5,7 @@ import logging
 
 def addLogHandler(handler):
     handler.setLevel(logging.INFO)
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s.%(funcName)s():%(lineno)s - %(levelname)s - %(message)s'))
     logging.getLogger('gamalytics').addHandler(handler)
     
 if __name__ == "__main__":

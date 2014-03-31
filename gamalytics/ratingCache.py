@@ -5,6 +5,7 @@ from gamalytics.models import Game,Rating
 from django.core.cache import cache
 from hashlib import md5
 import logging
+from django.utils import timezone
 
 class RatingCache:
   LOGGER = logging.getLogger(__name__)
@@ -38,10 +39,14 @@ class RatingCache:
     key=self.getKey(name)
     result=cache.get(key)
     if result is None:
+      start=timezone.now()
       result=self.calculateGameAveragedTags(name)
       cache.set(key, result, 0)
+      self.LOGGER.info('Calculated tags for ' + name + ' in: ' + str(timezone.now()-start))
+    else:
+      self.LOGGER.info('Received cached tags for ' + name)
     return result
-
-  def invalidate(self, game):
-    self.LOGGER.info('Invalidating ratings for game ' + game)
-    cache.delete(self.getKey(game.name))
+  
+  def invalidate(self, item):
+    self.LOGGER.info('Invalidating item ' + item)
+    cache.delete(self.getKey(item))

@@ -1,6 +1,5 @@
 from difflib import SequenceMatcher
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.shortcuts import render,redirect,render_to_response
 from django.utils import timezone
@@ -9,7 +8,6 @@ from gamalytics.ratingCache import RatingCache
 from gamalytics.scraper import scraperManager, metacriticScraper
 import logging
 
-CACHE_DURATION=60*5
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
 PLATFORMS=('PC','Playstation-4','Playstation-3','Xbox-One','Xbox-360','Wii-U','3DS','IOS',)
 ratingCache=RatingCache(False)
@@ -24,26 +22,29 @@ def getGamesWithTag(tag):
   key=ratingCache.getKey(tag)
   result=cache.get(key)
   if result is None:
-    games=[]
-    for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'):
-      games.append(rating.game)
-    result=set(games)
-    cache.set(key, result, CACHE_DURATION)
+    start=timezone.now()
+    result=set(rating.game for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'))
+    cache.set(key, result)
+    LOGGER.info('Got games with tag ' + tag + ' in: ' + str(timezone.now()-start))
   return result
 
 #Return a list of similar games along with how similar they are
 def getSimilar(ratings):
+  start=timezone.now()
   matchedGames=set(Game.objects.all())
   if len(ratings) > 0:
-    for tag,value in ratings:
+    for tag,_value in ratings:
       gamesWithTag=getGamesWithTag(tag)
       matchedGames=matchedGames.intersection(gamesWithTag)
   else:
     matchedGames=set()
-    LOGGER.error('views.getSimilar: ratings empty')
+    LOGGER.error('Ratings empty')
+  LOGGER.info('Got similar games with tags in ' + str(timezone.now()-start))
+  start=timezone.now()
   games={}
   for game in matchedGames:
     games[game] = ratingCache.getGameTagsAveraged(game.name)
+  LOGGER.info('Done getting averaged games in ' + str(timezone.now()-start))
   return games
 
 def index(request):
@@ -102,13 +103,14 @@ def search(request):
       searchTerms.remove(matchedTag)
     games=searchGames(searchTerms)
     result=(games,tagged)
-    cache.set(key, result, CACHE_DURATION)
+    cache.set(key, result, 60*5)#cache search results for 5 minutes
   else:
     games,tagged=result
   context={'games':games, 'tagged':tagged, 'searchString':searchString,'user':request.user}
   return render(request,'search.html',context)
 
 def game(request, name):
+  start=timezone.now()
   #get game
   try:
     game=Game.objects.get(name__iexact=name)
@@ -137,6 +139,7 @@ def game(request, name):
       'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
       'criticColor':criticColor,'userColor':userColor,'user':request.user,
       'userRatings':userRatings,'distinctTags':getDistinctTags()}
+  LOGGER.info('Took ' + str(timezone.now()-start) + ' to process request for game ' + name)
   return render(request,'game.html',context)
 
 def update(request):
@@ -162,7 +165,8 @@ def ratingadd(request):
     rating.delete()
   value=float(request.POST['value'])
   Rating.objects.create(username=username, game=game, tag=tag, value=value)
-  ratingCache.invalidate(game)
+  ratingCache.invalidate(game.name)
+  cache.remove(ratingCache.getKey(tag))
   return redirect('/g/' + game.name)
 
 def ratingremove(request):
@@ -171,7 +175,8 @@ def ratingremove(request):
   username=str(request.user)
   for rating in Rating.objects.filter(username=username, game=game, tag=tag):
     rating.delete()
-  ratingCache.invalidate(game)
+  ratingCache.invalidate(game.name)
+  cache.remove(ratingCache.getKey(tag))
   return redirect('/g/' + game.name)
 
 def registerrequest(request):
