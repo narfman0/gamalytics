@@ -9,6 +9,7 @@
 {% include 'header.html' %}
   <header>
     <h2>Register</h2>
+    <h3>Registration is currently disabled</h3>
   </header>
   {% if message == 'Success' %}
     Successfully registered user {{username}}, redirecting <a href='/'>home</a> (in 5 seconds)
@@ -21,9 +22,7 @@
     <input id="id_username" type="text" value="{{username}}" name="username"></p>
     <p><label for="id_password">Password:</label>
     <input id="id_password" type="password" value="" name="password"></p>
-    <p><label for="id_day">What is the day (number) today:</label>
-    <input id="id_day" type="number" value="" name="day"> (currently {{ time }})</p>
-    <input type="submit" value="Register">
+    <input type="submit" value="Register" disabled>
   </form>
 
 {% endblock %}

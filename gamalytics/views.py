@@ -176,18 +176,12 @@ def ratingremove(request):
 
 def registerrequest(request):
   username=request.POST['username']
-  password=request.POST['password']
-  day=request.POST['day']
-  message=''
-  try:
-    if timezone.now().day != int(day):
-      message='Day not correct, failure!'
-  except:
-    message='Day not a number, failure!'
-  if User.objects.filter(username=username).count() > 0:
-    message='User already registered, failure!'
-  if not message:
-    User.objects.create_user(username=username, password=password)
-    message='Success'
+  #password=request.POST['password']
+  message='Registration disabled'
+  #if User.objects.filter(username=username).count() > 0:
+  #  message='User already registered, failure!'
+  #if not message:
+  #  User.objects.create_user(username=username, password=password)
+  #  message='Success'
   return render(request,'registration/register.html',{'message':message, 
       'username':username, 'time':getCurrentRegistrationTimeString()})
