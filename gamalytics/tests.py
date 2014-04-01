@@ -1,9 +1,8 @@
 from django.test import TestCase
 from gamalytics.models import Game,Rating
 from ratingCache import RatingCache
-from django.utils import timezone
+from django.utils import timezone, unittest
 from gamalytics.scraper.metacriticScraper import getMetacriticScore
-import unittest
 
 class RatingCacheTest(TestCase):
   def setUp(self):
@@ -16,6 +15,10 @@ class RatingCacheTest(TestCase):
     Rating.objects.create(username='username',game_id='1',
         tag='pc',value=100,time=timezone.now())
 
+  def tearDown(self):
+      Game.objects.filter(name__startswith='testgame').delete()
+      Rating.objects.filter(username__startswith='username').delete()
+        
   def test_rating_cache_initial(self):
     cache=RatingCache(True)
     tags=cache.getGameTagsAveraged('testgame')

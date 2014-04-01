@@ -1,35 +1,30 @@
-from scipy.spatial import KDTree
-import numpy
 from gamalytics.models import Game, Rating
 
 def createRatingMap():
     '''Create map of rating to index'''
     ratingMap={}
     i=0
-    for rating in Rating.objects.values_list('tag', flat=True).distinct():
+    distinctTags=Rating.objects.values_list('tag', flat=True).distinct()
+    for rating in distinctTags:
         ratingMap[i]=rating
         i+=1
     return ratingMap
 
-def getGameTagArray(name, ratingCache, ratingMap):
-    tags=ratingCache.calculateGameAveragedTagsMap(name)
-    tagValues=[None]*len(ratingMap)
-    for i,tag in ratingMap.iteritems():
-        tagValues[i] = tags[tag] if tag in tags else 0
-    return tagValues
-
-def createTree(ratingCache, ratingMap):
-    array=[]
-    for game in Game.objects.all():
-        array.append(getGameTagArray(game.name, ratingCache, ratingMap))
-    x = numpy.mgrid[array]
-    return KDTree(zip(x.ravel()))
-
-def getSimilar(name, tree, ratingCache, ratingMap):
-    return tree.query(getGameTagArray(name, ratingCache, ratingMap), 10)
-
-if __name__ == '__main__':
-    x = numpy.mgrid[0:100]
-    points = zip(x.ravel())
-    tree=KDTree(points)
-    print(tree.query([50], 10))
+def similarity(game1, game2, ratingCache, distinctTags):
+    game1tags=ratingCache.calculateGameAveragedTagsMap(game1)
+    game2tags=ratingCache.calculateGameAveragedTagsMap(game2)
+    score=0.0
+    matched=0.0
+    unmatched=0.0
+    for tag in distinctTags:
+        if tag in game1tags and tag in game2tags:
+            score += 1.0 - abs(game1tags[tag]/100.0 - game2tags[tag]/100.0)
+            matched+=1
+        elif (tag not in game1tags and tag not in game2tags):
+            pass
+        else:#in one but not the other
+            unmatched += 1
+    #need to divide by matched since we've added, but it is also in the ratio
+    #numerator so changing that to 1 instead
+    ratio=1.0/(unmatched+matched)
+    return score * ratio
