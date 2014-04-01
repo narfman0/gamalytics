@@ -1,5 +1,5 @@
 from gamalytics.ratingCache import RatingCache
-from gamalytics.similar.similar import similarity
+from gamalytics.similar.similar import calculateSimilarity
 from gamalytics.models import Game, Rating
 from django.utils import timezone, unittest
 
@@ -34,8 +34,8 @@ class Test(unittest.TestCase):
     def test_similarity(self):
         cache=RatingCache(False)
         distinctTags=Rating.objects.values_list('tag', flat=True).distinct()
-        self.assertEqual(1.0, similarity('testgame1', 'testgame2', cache, distinctTags))
-        self.assertEqual(0.5, similarity('testgame1', 'testgame3', cache, distinctTags))
+        self.assertEqual(1.0, calculateSimilarity('testgame1', 'testgame2', cache, distinctTags))
+        self.assertEqual(0.5, calculateSimilarity('testgame1', 'testgame3', cache, distinctTags))
 
 if __name__ == "__main__":
     unittest.main()
