@@ -6,6 +6,7 @@ from django.utils import timezone
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.scraper import scraperManager, metacriticScraper
+from gamalytics.settings import LOG_PATH
 import logging
 
 GENRES=('Action','Adventure','Fighting','First-person','Flight','Party','Platformer','Puzzle','Racing','Real-time','Role-playing','Simulation','Sports','Strategy','Third-person',)
@@ -139,9 +140,6 @@ def logout(request):
   auth_logout(request)
   return redirect('/')
 
-def logs(request):
-  return render(request,'logs.html',{'logs':(line.rstrip('\n') for line in open('gamalytics.log'))})
-
 def register(request):
   return render(request,'registration/register.html',{'error':'', 'username':'',
       'time':getCurrentRegistrationTimeString()})
@@ -179,3 +177,6 @@ def registerrequest(request):
   #  message='Success'
   return render(request,'registration/register.html',{'message':message, 
       'username':username, 'time':getCurrentRegistrationTimeString()})
+
+def control(request):
+  return render(request,'control.html',{'logs':open(LOG_PATH).read()})

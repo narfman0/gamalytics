@@ -135,6 +135,8 @@ INSTALLED_APPS = (
 
 INTERNAL_IPS = ('127.0.0.1',)
 
+LOG_PATH = PROJECT_PATH + '/gamalytics.log'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -161,7 +163,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': PROJECT_PATH + '/gamalytics.log',
+            'filename': LOG_PATH,
         },
         'console': {
             'level': 'INFO',

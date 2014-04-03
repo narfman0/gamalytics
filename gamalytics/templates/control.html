@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block head %}
+  <title>Gamalytics - Control area</title>
+{% endblock %}
+{% block body %}
+{% include 'header.html' %}
+<div id='logs'>
+  Logs:<br/>
+  <textarea rows="20" cols="120">{{logs}}</textarea> 
+</div>
+{% endblock %}
