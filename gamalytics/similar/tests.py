@@ -12,9 +12,9 @@ class Test(unittest.TestCase):
                 gametrailersVideo='http://gametrailers.com',
                 description='description',released=timezone.now(),
                 lastUpdated=timezone.now())
-            Rating.objects.create(username='username',game_id=str(i+1),
+            Rating.objects.create(username='username',game_id=str(Game.objects.count()),
                 tag='pc',value=100,time=timezone.now())
-            Rating.objects.create(username='username',game_id=str(i+1),
+            Rating.objects.create(username='username',game_id=str(Game.objects.count()),
                 tag='role-playing',value=100,time=timezone.now())
         Game.objects.create(name='testgame3',
             metacritic='http://metacritic.com',
@@ -22,9 +22,9 @@ class Test(unittest.TestCase):
             gametrailersVideo='http://gametrailers.com',
             description='description',released=timezone.now(),
             lastUpdated=timezone.now())
-        Rating.objects.create(username='username',game_id='4',
+        Rating.objects.create(username='username',game_id=str(Game.objects.count()),
             tag='pc',value=50,time=timezone.now())
-        Rating.objects.create(username='username',game_id='4',
+        Rating.objects.create(username='username',game_id=str(Game.objects.count()),
             tag='role-playing',value=50,time=timezone.now())
     
     def tearDown(self):
