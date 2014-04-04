@@ -1,7 +1,7 @@
 from gamalytics.ratingCache import RatingCache
-from gamalytics.similar.similarBrute import calculateSimilarity
 from gamalytics.models import Game, Rating
 from django.utils import timezone, unittest
+from gamalytics.similar import similarBrute, similarKDTree
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -31,11 +31,15 @@ class Test(unittest.TestCase):
         Game.objects.filter(name__startswith='testgame').delete()
         Rating.objects.filter(username__iexact='username').delete()
 
-    def test_similarity(self):
+    def testSimilarBrute(self):
         cache=RatingCache(False)
         distinctTags=Rating.objects.values_list('tag', flat=True).distinct()
-        self.assertEqual(1.0, calculateSimilarity('testgame1', 'testgame2', cache, distinctTags))
-        self.assertEqual(0.5, calculateSimilarity('testgame1', 'testgame3', cache, distinctTags))
+        self.assertEqual(1.0, similarBrute.calculateSimilarity('testgame1', 'testgame2', cache, distinctTags))
+        self.assertEqual(0.5, similarBrute.calculateSimilarity('testgame1', 'testgame3', cache, distinctTags))
+
+    def testSimilarKDTree(self):
+        _ratingCache=RatingCache(False)
+        #similarKDTree.getSimilar('testgame1', _ratingCache, None)
 
 if __name__ == "__main__":
     unittest.main()
