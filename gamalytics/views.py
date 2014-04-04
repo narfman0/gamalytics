@@ -6,6 +6,7 @@ from django.utils import timezone
 from gamalytics.models import Game,Rating
 from gamalytics.ratingCache import RatingCache
 from gamalytics.scraper import scraperManager, metacriticScraper
+from gamalytics.similar.similarSetIntersection import getSimilar
 from gamalytics.settings import LOG_PATH
 import logging
 
@@ -17,25 +18,6 @@ LOGGER = logging.getLogger(__name__)
 #Return string formatted to how registration pages want it
 def getCurrentRegistrationTimeString():
   return timezone.now().strftime('%b %d, %Y')
-
-#Return a list of similar games along with how similar they are
-def getSimilar(ratings):
-  start=timezone.now()
-  matchedGames=set(Game.objects.all())
-  if len(ratings) > 0:
-    for tag,_value in ratings:
-      gamesTag=set(rating.game for rating in Rating.objects.filter(tag__iexact=tag).select_related('game'))
-      matchedGames=matchedGames.intersection(gamesTag)
-  else:
-    matchedGames=set()
-    LOGGER.error('Ratings empty')
-  LOGGER.info('Got similar games with tags in ' + str(timezone.now()-start))
-  start=timezone.now()
-  games={}
-  for game in matchedGames:
-    games[game] = ratingCache.getGameTagsAveraged(game.name)
-  LOGGER.info('Done getting averaged games in ' + str(timezone.now()-start))
-  return games
 
 def index(request):
   games=list(Game.objects.all().order_by('released'))[-10:]
@@ -126,7 +108,7 @@ def game(request, name):
       userRatings[rating.tag]=int(rating.value)
   userRatings=sorted(userRatings.items(), key=lambda x: x[1], reverse=True)
   context={'game':game, 'ratings':ratings, 'released':released,
-      'similar':getSimilar(ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
+      'similar':getSimilar(name, ratingCache, ratings), 'scoreCritic':scoreCritic,'scoreUser':scoreUser,
       'criticColor':criticColor,'userColor':userColor,'user':request.user,
       'userRatings':userRatings,'distinctTags':getDistinctTags()}
   LOGGER.info('Took ' + str(timezone.now()-start) + ' to process request for game ' + name)

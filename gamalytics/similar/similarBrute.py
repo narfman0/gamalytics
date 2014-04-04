@@ -34,7 +34,7 @@ def getSimilarity(game1, game2, ratingCache, distinctTags):
         cache.set(key, similarity, 0)
     return similarity
 
-def getSimilar(gamename, ratingCache, n=10):
+def getSimilar(gamename, ratingCache, ratings, n=10):
     gameSimilarityMap={}
     distinctTags = Rating.objects.values_list('tag', flat=True).distinct()
     i=0

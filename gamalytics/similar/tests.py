@@ -1,5 +1,5 @@
 from gamalytics.ratingCache import RatingCache
-from gamalytics.similar.similar import calculateSimilarity
+from gamalytics.similar.similarBrute import calculateSimilarity
 from gamalytics.models import Game, Rating
 from django.utils import timezone, unittest
 
